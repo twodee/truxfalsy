@@ -1,18 +1,18 @@
 var worlds = [];
 {
   var levels = [];
-  levels.push({name: 'Halftime', configuration: '1111100000111110000011111000001111100000111110000011111000001111100000111110000011111000001111100000', message: 'Make Actual match Expected! In the box above, enter an expression in terms of <code>x</code> and <code>y</code> that\'s true for all the colored tiles in Expected. For example, <code>y &gt;= 8</code>. Operators <code>&lt;</code>, <code>&lt;=</code>, and <code>&gt;</code> are also available.'});
-  levels.push({name: 'Balcony', configuration: '0000000000000000000000000000000000000000000000000000000000001111111111000000000000000000000000000000', message: 'If you want to check that <code>x</code> or <code>y</code> is an exact value, use <code>==</code>. For example, <code>y == 0</code>.'});
-  levels.push({name: 'Neg8', configuration: '1111111101111111110111111111011111111101111111110111111111011111111101111111110111111111011111111101', message: 'Sometimes you want <code>x</code> or <code>y</code> to not be a certain value. Use <code>!=</code> to assert this. For example, <code>y != 1</code>.'});
-  levels.push({name: 'Dos Reglas', configuration: '0001000000000100000000010000000001000000111111111100010000000001000000000100000000010000000001000000', message: 'If there are multiple ways for a tile to be true, combine the criteria using OR. For example, <code>x == 0 OR y > 5</code>.'});
-  levels.push({name: 'Building', configuration: '0000000000000000000000000000000000001111000000111100000011110000001111000000111100000011110000001111', message: 'If several criteria must all be met for a tile to be true, combine them using AND. For example, <code>x < 3 AND y == 3</code>.'});
-  levels.push({name: 'Couple of Pairs', configuration: '1100000011000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', message: 'When you combine multiple criteria, watch out for operator precedence. AND has higher precedence than OR. Add parentheses to <code>x < 2 OR x > 7 AND y == 0</code> to solve this level.'});
-  levels.push({name: 'Counterexample', configuration: '1111111111011111111101111111110111111111011111111101111111110111111111011111111101111111110111111111', message: 'Sometimes it\'s easier to think in reverse. Enter <code>x == 0 AND y > 0</code> in the box. This is the exact opposite of what you want. Flip the logic by negating the <i>entire</i> expression with the NOT operator.'});
-  worlds.push(levels);
+  levels.push({name: 'Halftime', configuration: '1111100000111110000011111000001111100000111110000011111000001111100000111110000011111000001111100000'});
+  levels.push({name: 'Balcony', configuration: '0000000000000000000000000000000000000000000000000000000000001111111111000000000000000000000000000000', message: 'If you want to express a particular <code>x</code> or <code>y</code> value, use <code>==</code>. For example, <code>y == 0</code> causes the bottom row of kids to be born.'});
+  levels.push({name: 'Neg8', configuration: '1111111101111111110111111111011111111101111111110111111111011111111101111111110111111111011111111101', message: 'Sometimes you want to express all <code>x</code> or <code>y</code> values except a certain value. Use <code>!=</code> for this. For example, <code>y != 1</code> causes all rows but row 1 one to be born.'});
+  levels.push({name: 'Dos Reglas', configuration: '0001000000000100000000010000000001000000111111111100010000000001000000000100000000010000000001000000', message: 'If the desired brood is the union of several expressions, combine the expressions using <code>OR</code>. For example, <code>x == 0 OR y > 5</code> causes the kids in either group to be born.'});
+  levels.push({name: 'Building', configuration: '0000000000000000000000000000000000001111000000111100000011110000001111000000111100000011110000001111', message: 'If the desired brood is the intersection of several expressions, combine the expressions using <code>AND</code>. For example, <code>x < 3 AND y == 3</code> causes only the kids in both groups to be born.'});
+  levels.push({name: 'Couple of Pairs', configuration: '1100000011000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', message: 'When you combine multiple expressions, watch out for operator precedence. In particular, <code>AND</code> has higher precedence than <code>OR</code>. Add parentheses to <code>x < 2 OR x > 7 AND y == 0</code> to alter the default precedence and solve this level.'});
+  levels.push({name: 'Counterexample', configuration: '1111111111011111111101111111110111111111011111111101111111110111111111011111111101111111110111111111', message: 'Sometimes it\'s easier to express children in reverse. Enter <code>x == 0 AND y > 0</code> in the box. This litter is the exact opposite of what you want. Flip the logic by negating the <i>entire</i> expression with the NOT operator. For example, <code>NOT(x == 0 || x == 2)</code> expresses all kids except those in columns 0 and 2.'});
+  worlds.push({levels: levels, message: "You've finished the tutorial litters of Generation 0! Mom and Dad are pleased with your services and invite you to help them with the litters of Generation 1. Are you ready to write some expressions with the logical operators (<code>AND</code>, <code>OR</code>, and <code>NOT</code>), the relational operators (<code>&gt;</code>, <code>&gt;</code>=, <code>&lt;</code>, <code>&lt;</code>=), the equality operators (<code>==</code>, <code>!=</code>), and the arithmetic operators (<code>*</code>, <code>/</code>, <code>%</code>, <code>+</code>, <code>-</code>)? If so, hit Enter."});
 }
 {
   var levels = [];
-  levels.push({name: 'Flag', configuration: '0000000000000000000000000000000000000000000000000000000000001111100000111110000011111000001111100000'});
+  levels.push({name: 'Phalanx', configuration: '0000000000000000000000000000000000000000000000000000000000001111100000111110000011111000001111100000'});
   levels.push({name: 'Alone', configuration: '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000'});
   levels.push({name: 'Hammer', configuration: '0000110000000011000000001100000000110000111111111111111111111111111111111111111111111111111111111111'});
   levels.push({name: 'Inbox', configuration: '0000000000000000000000000000000001111000000111100000011110000001111000000000000000000000000000000000'});
@@ -32,7 +32,7 @@ var worlds = [];
   levels.push({name: 'Tracks', configuration: '0100000000101000000001010000000010100000000101000000001010000000010100000000101000000001010000000010'});
   levels.push({name: 'Rank and File', configuration: '1101111111000000000011011111111101111111110111111111011111111101111111110111111111011111111101111111'});
   levels.push({name: 'Groups', configuration: '0101010101000000000001010101010101010101010101010100000000000101010101010101010101010101010000000000'});
-  worlds.push(levels);
+  worlds.push({levels: levels, message: "This game seems to be your BRED and butter! Are you ready to help the next generation? If so, hit Enter."});
 }
 {
   var levels = [];
@@ -56,7 +56,7 @@ var worlds = [];
   levels.push({name: 'Unoriginal', configuration: '0111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111'});
   levels.push({name: 'Sample', configuration: '1111111111111111111111111111110000111111111111111111111111111111111111111111111111111111111111111111'});
   levels.push({name: 'Square', configuration: '1111111111100000000110000000011000000001100000000110000000011000000001100000000110000000011111111111'});
-  worlds.push(levels);
+  worlds.push({levels: levels, message: "asfsd"});
 }
 {
   var levels = [];
@@ -81,5 +81,5 @@ var worlds = [];
   levels.push({name: 'Stairing Contest', configuration: '0000111100001111000011110000111100001111000011110000111100001111000011110000111100001111000011110000'});
   levels.push({name: 'Glasses', configuration: '0000000000000000000000000000000000000111000000111100000011110000110001000111000100011100010001111110'});
   levels.push({name: 'Russian', configuration: '1111111111100000000010111111101010000010101011101010101010101010111010101000001010111111101000000000'});
-  worlds.push(levels);
+  worlds.push({levels: levels, message: "12321"});
 }

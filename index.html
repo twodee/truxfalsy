@@ -28,7 +28,7 @@ function showBalloon(msg) {
       css: {
         fontSize: '18pt',
         fontFamily: 'sans-serif',
-        width: 1100,
+        width: 1000,
       },
       contents: msg,
     });
@@ -42,8 +42,81 @@ function hideBalloon() {
   isShown = false;
 }
 
+var intro = [
+  {selector: 'body', message: 'Welcome to Trux Falsy, a game where Space and Logic marry and have somewhere between 0 and 100 kids. You, a gene therapist, will help them have the ones they want. Click in this box to proceed.'},
+  {selector: '#expectedGrid', message: 'On the left you see the kids they want to have. They are brightly colored. Each lives at a particular two-dimensional location.'},
+  {selector: '#bookmark82', message: 'For example, this kid lives at x == 2, y == 8.'},
+  {selector: '#actualGrid', message: 'On the right are the kids that will actually be born given the couple\'s current Genetic Expression.'},
+  {selector: '#guess', message: 'In the box above, enter a Genetic Expression using the language of logic&mdash;that is, in terms of <code>x</code>, <code>y</code>, and various operators that you will learn about. Express x and y values only for the kids shown in Expected. For example, <code>y &gt;= 8</code> causes the top two rows to be born. Operators <code>&lt;</code>, <code>&lt;=</code>, and <code>&gt;</code> are also available.'},
+];
+var ii = 0;
+
+function advanceIntro() {
+  if (ii > 0) {
+    $(intro[ii].selector).hideBalloon();
+  }
+
+  var offsetX = 0;
+  var offsetY = 0;
+  var position = "bottom";
+  var width = 0;
+
+  if (ii == 0) {
+    width = 500;
+    position = null;
+  } else if (ii == 2) {
+    width = 250;
+  } else {
+    width = $(intro[ii].selector).width();
+  }
+
+  if (ii == intro.length - 1) {
+    showBalloon(intro[ii].message);
+  } else {
+    $(intro[ii].selector).showBalloon({
+      position: position,
+      offsetX: offsetX,
+      offsetY: offsetY,
+      tipSize: ii == 0 ? 0 : 10,
+      html: true,
+      minLifetime: 0,
+      hideComplete: function() {
+        ++ii;
+        advanceIntro();
+      },
+      css: {
+        fontSize: '18pt',
+        fontFamily: 'sans-serif',
+        width: width
+      },
+      classname: 'balloon',
+      contents: localize(intro[ii].message),
+    });
+  }
+
+  if (ii < intro.length - 1) {
+    $('.balloon').on('click', function() {
+      $(intro[ii].selector).hideBalloon();
+    });
+  } else {
+    $('.balloon').off('click');
+    document.getElementById('guess').focus();
+  }
+}
+
 $(document).ready(function() {
   load();
+  var node82 = document.getElementById('expectedBottom82');
+  var rect = node82.getBoundingClientRect();
+
+  var bookmark82 = document.getElementById('bookmark82');
+  bookmark82.style.position = 'absolute';
+  bookmark82.style.left = rect.left + 'px';
+  bookmark82.style.top = (rect.top + window.scrollY) + 'px';
+  bookmark82.style.width = rect.width + 'px';
+  bookmark82.style.height = rect.height + 'px';
+  
+  advanceIntro();
 });
   </script>
   <style>
@@ -67,12 +140,12 @@ $(document).ready(function() {
   clear: both;
   margin-left: auto;
   margin-right: auto;
-  width: 1100px;
+  width: 1000px;
 }
 
 .grid {
-  width: 500px;
-  height: 500px;
+  width: 450px;
+  height: 450px;
   text-align: center;
 }
 
@@ -90,44 +163,18 @@ $(document).ready(function() {
   font-family: 'Courier';
 }
 
-#feedback_right {
+#percentage {
   float: right;
   color: red;
   font-size: 14px;
-}
-
-@media (max-width: 1000px) {
-  #main {
-    width: 950px;
-  }
-  .grid {
-    width: 500px;
-    height: 500px;
-  }
-}
-
-@media (max-width: 800px) {
-  #main {
-    width: 750px;
-  }
-  .grid {
-    width: 350px;
-    height: 350px;
-  }
-}
-
-@media (max-width: 600px) {
-  #main {
-    width: 550px;
-  }
-  .grid {
-    width: 250px;
-    height: 250px;
-  }
+  margin-bottom: 5px;
+  margin-right: 0px;
 }
   </style>
 </head>
 <body>
+
+<div id="bookmark82"></div>
 
 <div id="main">
   <h1 id="levelName" style="clear: both">Level Name</h1>
@@ -143,9 +190,7 @@ $(document).ready(function() {
     </div>
   </div>
 
-  <div style="clear: both">
-    <span id="feedback_right">&nbsp;</span>
-  </div>
+  <span style="clear:both" id="percentage">&nbsp;</span>
   <input id="guess" type="text" oninput="showGuess()"></input><br/>
 </div>
 
@@ -183,7 +228,6 @@ var NOT = 13;
 var INTEGER = 14;
 var EOF = 15;
 var ADD = 16;
-var SUBTRACT = 17;
 var MULTIPLY = 18;
 var DIVIDE = 19;
 var REMAINDER = 20;
@@ -197,8 +241,12 @@ var MAX = 27;
 var MIN = 28;
 var COMMA = 29;
 
-function escapeRegexWildcards(s) {                                                                                                                                                                             
+function escapeRegexWildcards(s) {
   return s.replace(/([-.?*+$\[\]\/\\(){}|])/g, '\\$1');
+}
+
+function localize(s) {
+  return s.replace(/AND/g, andToken).replace(/OR/g, orToken).replace(/NOT/g, notToken);
 }
 
 function Token(type, text, startIndex, endIndex) {
@@ -245,6 +293,9 @@ function Lexer(src) {
     } else if (left.match(/^,/)) {
       ++this.i;
       return new Token(COMMA, ',', this.soFarStartedAt, this.i);
+    } else if (left.match(/^-/)) {
+      ++this.i;
+      return new Token(MINUS, '-', this.soFarStartedAt, this.i);
     } else if (left.match(/^x/)) {
       ++this.i;
       return new Token(X, 'x', this.soFarStartedAt, this.i);
@@ -275,9 +326,6 @@ function Lexer(src) {
     } else if (left.match(/^\+/)) {
       ++this.i;
       return new Token(ADD, '+', this.soFarStartedAt, this.i);
-    } else if (left.match(/^-/)) {
-      ++this.i;
-      return new Token(SUBTRACT, '-', this.soFarStartedAt, this.i);
     } else if (left.match(/^\^/)) {
       ++this.i;
       return new Token(XOR, '^', this.soFarStartedAt, this.i);
@@ -337,7 +385,9 @@ function ExpressionOr(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return ll || rr;
+    if (!ll.isBoolean) throw '<code>OR</code> expects boolean operands.';
+    if (!rr.isBoolean) throw '<code>OR</code> expects boolean operands.';
+    return new ExpressionBoolean(ll.toBoolean() || rr.toBoolean());
   }
 }
 
@@ -347,7 +397,9 @@ function ExpressionAnd(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return ll && rr;
+    if (!ll.isBoolean) throw '<code>AND</code> expects boolean operands.';
+    if (!rr.isBoolean) throw '<code>AND</code> expects boolean operands.';
+    return new ExpressionBoolean(ll.toBoolean() && rr.toBoolean());
   }
 }
 
@@ -357,7 +409,9 @@ function ExpressionBitwiseOr(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return ll | rr;
+    if (!ll.isInteger) throw '<code>|</code> expects integer operands.';
+    if (!rr.isInteger) throw '<code>|</code> expects integer operands.';
+    return new ExpressionInteger(ll.toInteger() | rr.toInteger());
   }
 }
 
@@ -367,7 +421,9 @@ function ExpressionBitwiseAnd(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return ll & rr;
+    if (!ll.isInteger) throw '<code>&</code> expects integer operands.';
+    if (!rr.isInteger) throw '<code>&</code> expects integer operands.';
+    return new ExpressionInteger(ll.toInteger() & rr.toInteger());
   }
 }
 
@@ -377,7 +433,13 @@ function ExpressionXor(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return ll ^ rr;
+    if (ll.isInteger && rr.isInteger) {
+      return new ExpressionInteger(ll.toInteger() ^ rr.toInteger());
+    } else if (ll.isBoolean && rr.isBoolean) {
+      return new ExpressionBoolean(ll.toBoolean() != rr.toBoolean());
+    } else {
+      throw '<code>^</code> expects its operands to have the same type.';
+    }
   }
 }
 
@@ -385,7 +447,8 @@ function ExpressionNot(r) {
   this.r = r;
   this.evaluate = function(env) {
     var rr = r.evaluate(env); 
-    return !rr;
+    if (!rr.isBoolean) throw '<code>NOT</code> expects boolean operands.';
+    return new ExpressionBoolean(!rr.toBoolean());
   }
 }
 
@@ -393,7 +456,8 @@ function ExpressionAbs(r) {
   this.r = r;
   this.evaluate = function(env) {
     var rr = r.evaluate(env); 
-    return Math.abs(rr);
+    if (!rr.isInteger) throw '<code>ABS</code> expects integer operands.';
+    return new ExpressionInteger(Math.abs(rr.toInteger()));
   }
 }
 
@@ -403,7 +467,9 @@ function ExpressionMax(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return (ll > rr) ? ll : rr;
+    if (!ll.isInteger) throw '<code>max</code> expects integer operands.';
+    if (!rr.isInteger) throw '<code>max</code> expects integer operands.';
+    return new ExpressionInteger((ll.toInteger() > rr.toInteger()) ? ll.toInteger() : rr.toInteger());
   }
 }
 
@@ -413,7 +479,9 @@ function ExpressionMin(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return (ll < rr) ? ll : rr;
+    if (!ll.isInteger) throw '<code>min</code> expects integer operands.';
+    if (!rr.isInteger) throw '<code>min</code> expects integer operands.';
+    return new ExpressionInteger((ll.toInteger() < rr.toInteger()) ? ll.toInteger() : rr.toInteger());
   }
 }
 
@@ -423,7 +491,13 @@ function ExpressionEquals(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return ll == rr;
+    if (ll.isInteger && rr.isInteger) {
+      return new ExpressionBoolean(ll.toInteger() == rr.toInteger());
+    } else if (ll.isBoolean && rr.isBoolean) {
+      return new ExpressionBoolean(ll.toBoolean() == rr.toBoolean());
+    } else {
+      throw '<code>==</code> expects its operands to have the same type.';
+    }
   }
 }
 
@@ -433,7 +507,13 @@ function ExpressionNotEquals(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return ll != rr;
+    if (ll.isInteger && rr.isInteger) {
+      return new ExpressionBoolean(ll.toInteger() != rr.toInteger());
+    } else if (ll.isBoolean && rr.isBoolean) {
+      return new ExpressionBoolean(ll.toBoolean() != rr.toBoolean());
+    } else {
+      throw '<code>!=</code> expects its operands to have the same type.';
+    }
   }
 }
 
@@ -443,7 +523,9 @@ function ExpressionGreaterThan(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return ll > rr;
+    if (!ll.isInteger) throw '<code>&gt;</code> expects integer operands.';
+    if (!rr.isInteger) throw '<code>&gt;</code> expects integer operands.';
+    return new ExpressionBoolean(ll.toInteger() > rr.toInteger());
   }
 }
 
@@ -453,7 +535,9 @@ function ExpressionGreaterThanEquals(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return ll >= rr;
+    if (!ll.isInteger) throw '<code>&gt;=</code> expects integer operands.';
+    if (!rr.isInteger) throw '<code>&gt;=</code> expects integer operands.';
+    return new ExpressionBoolean(ll.toInteger() >= rr.toInteger());
   }
 }
 
@@ -463,7 +547,9 @@ function ExpressionLessThan(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return ll < rr;
+    if (!ll.isInteger) throw '<code>&lt;</code> expects integer operands.';
+    if (!rr.isInteger) throw '<code>&lt;</code> expects integer operands.';
+    return new ExpressionBoolean(ll.toInteger() < rr.toInteger());
   }
 }
 
@@ -473,7 +559,9 @@ function ExpressionLessThanEquals(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return ll <= rr;
+    if (!ll.isInteger) throw '<code>&lt;=</code> expects integer operands.';
+    if (!rr.isInteger) throw '<code>&lt;=</code> expects integer operands.';
+    return new ExpressionBoolean(ll.toInteger() <= rr.toInteger());
   }
 }
 
@@ -483,7 +571,9 @@ function ExpressionAdd(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return ll + rr;
+    if (!ll.isInteger) throw '<code>+</code> expects integer operands.';
+    if (!rr.isInteger) throw '<code>+</code> expects integer operands.';
+    return new ExpressionInteger(ll.toInteger() + rr.toInteger());
   }
 }
 
@@ -493,7 +583,9 @@ function ExpressionSubtract(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return ll - rr;
+    if (!ll.isInteger) throw '<code>-</code> expects integer operands.';
+    if (!rr.isInteger) throw '<code>-</code> expects integer operands.';
+    return new ExpressionInteger(ll.toInteger() - rr.toInteger());
   }
 }
 
@@ -503,7 +595,9 @@ function ExpressionMultiply(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return ll * rr;
+    if (!ll.isInteger) throw '<code>*</code> expects integer operands.';
+    if (!rr.isInteger) throw '<code>*</code> expects integer operands.';
+    return new ExpressionInteger(ll.toInteger() * rr.toInteger());
   }
 }
 
@@ -513,7 +607,9 @@ function ExpressionDivide(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return ll / rr;
+    if (!ll.isInteger) throw '<code>/</code> expects integer operands.';
+    if (!rr.isInteger) throw '<code>/</code> expects integer operands.';
+    return new ExpressionInteger(ll.toInteger() / rr.toInteger());
   }
 }
 
@@ -523,7 +619,9 @@ function ExpressionRemainder(l, r) {
   this.evaluate = function(env) {
     var ll = l.evaluate(env); 
     var rr = r.evaluate(env); 
-    return ll % rr;
+    if (!ll.isInteger) throw '<code>%</code> expects integer operands.';
+    if (!rr.isInteger) throw '<code>%</code> expects integer operands.';
+    return new ExpressionInteger(ll.toInteger() % rr.toInteger());
   }
 }
 
@@ -531,38 +629,50 @@ function ExpressionNegative(r) {
   this.r = r;
   this.evaluate = function(env) {
     var rr = r.evaluate(env); 
-    return -rr;
+    if (!rr.isInteger) throw '<code>-</code> exprects an integer operand.';
+    return new ExpressionInteger(-rr);
   }
 }
 
-function ExpressionInteger(literal) {
-  this.literal = literal;
+function ExpressionInteger(value) {
+  this.value = parseInt(value);
+
   this.evaluate = function(env) {
-    return parseInt(literal);
+    return this;
+  }
+
+  this.isBoolean = false;
+  this.isInteger = true;
+
+  this.toInteger = function() {
+    return value;
   }
 }
 
 function ExpressionX() {
   this.evaluate = function(env) {
-    return env.x;
+    return new ExpressionInteger(env.x);
   }
 }
 
 function ExpressionY() {
   this.evaluate = function(env) {
-    return env.y;
+    return new ExpressionInteger(env.y);
   }
 }
 
-function ExpressionTrue() {
-  this.evaluate = function(env) {
-    return true;
-  }
-}
+function ExpressionBoolean(value) {
+  this.value = value;
 
-function ExpressionFalse() {
   this.evaluate = function(env) {
-    return false;
+    return this;
+  }
+
+  this.isBoolean = true;
+  this.isInteger = false;
+
+  this.toBoolean = function() {
+    return value;
   }
 }
 
@@ -677,7 +787,7 @@ function Parser(tokens) {
 
   this.expressionAdditive = function() {
     this.expressionMultiplicative();
-    while (this.isUp(ADD) || this.isUp(SUBTRACT)) {
+    while (this.isUp(ADD) || this.isUp(MINUS)) {
       var type = this.tokens[this.i].type;
       ++this.i;
       this.expressionMultiplicative();
@@ -766,10 +876,10 @@ function Parser(tokens) {
       this.expressions.push(new ExpressionX());
     } else if (this.isUp(LITERAL_TRUE)) {
       ++this.i;
-      this.expressions.push(new ExpressionTrue());
+      this.expressions.push(new ExpressionBoolean(true));
     } else if (this.isUp(LITERAL_FALSE)) {
       ++this.i;
-      this.expressions.push(new ExpressionFalse());
+      this.expressions.push(new ExpressionBoolean(false));
     } else if (this.isUp(Y)) {
       ++this.i;
       this.expressions.push(new ExpressionY());
@@ -808,6 +918,7 @@ function showGuess() {
   var src = document.getElementById('guess').value;
 
   if (src == '') {
+    document.getElementById('percentage').innerHTML = '&nbsp;';
     load();
     return;
   }
@@ -827,18 +938,20 @@ function showGuess() {
         var actualBottom = document.getElementById('actualBottom' + i);    
         var result = ast.evaluate({'x': x, 'y': y});
 
-        if (result === true || result === false) {
-          if (result) {
+        if (result.isBoolean) {
+          if (result.toBoolean()) {
             actualTop.style.fill = topTrueColor;
             actualBottom.style.fill = bottomTrueColor;
           } else {
             actualTop.style.fill = topFalseColor;
             actualBottom.style.fill = bottomFalseColor;
           }
+        } else {
+          throw 'Your expression doesn\'t yield true or false.';
         }
 
         var wrong = document.getElementById('wrong' + i);    
-        if (result === leval(wi, li, x, y)) {
+        if (result.isBoolean && result.toBoolean() === leval(wi, li, x, y)) {
           wrong.style['stroke-opacity'] = 0.0;
           ++nRight;
         } else {
@@ -847,24 +960,24 @@ function showGuess() {
       }
     }
 
-    document.getElementById('feedback_right').innerHTML = nRight + '/100 right';
+    document.getElementById('percentage').innerHTML = nRight + '/100 right';
     if (nRight == 100) {
-      if (li == worlds[wi].length - 1) {
-        showBalloon('You beat world ' + wi + '! Hit Enter to advance to world ' + (wi + 1) % worlds.length + '.');
+      if (li == worlds[wi].levels.length - 1) {
+        showBalloon(localize(worlds[wi].message));
       } else {
-        showBalloon('Nice! Hit Enter for the next level.');
+        showBalloon('Got \'em! Hit Enter for the next litter.');
       }
     }
   } catch (e) {
-    document.getElementById('feedback_right').innerHTML = e;
+    document.getElementById('percentage').innerHTML = localize(e);
   }
 
   return true;
 }
 
 function next() {
-  document.getElementById('feedback_right').innerHTML = '&nbsp;';
-  if (li == worlds[wi].length - 1) {
+  document.getElementById('percentage').innerHTML = '&nbsp;';
+  if (li == worlds[wi].levels.length - 1) {
     wi = (wi + 1) % worlds.length;
     li = 0;
   } else {
@@ -878,7 +991,7 @@ function next() {
 // The second-to-bottom is for the x tic marks. We don't allow
 // these marks to be taller than the tiles. The bottom is the
 // axis label.
-var gridHeight = 500;
+var gridHeight = 450;
 var tileDiameter = gridHeight / 12;
 var tileRadius = tileDiameter * 0.5;
 var strikeDiameter = 0.7 * tileDiameter;
@@ -979,7 +1092,7 @@ for (var y = 0; y < 10; ++y) {
 }
 
 function leval(wi, li, x, y) {
-  return worlds[wi][li].configuration.charAt(y * 10 + x) == '1';
+  return worlds[wi].levels[li].configuration.charAt(y * 10 + x) == '1';
 }
 
 var wi = 0;
@@ -987,7 +1100,7 @@ var li = 0;
 
 function load() {
   nRight = 0;
-  document.getElementById('levelName').innerHTML = 'Level ' + wi + '.' + li + ': ' + worlds[wi][li].name;
+  document.getElementById('levelName').innerHTML = 'Generation ' + wi + ', Litter ' + li + ': ' + worlds[wi].levels[li].name;
   for (var y = 0; y < 10; ++y) {
     for (var x = 0; x < 10; ++x) {
       var i = y * 10 + x;
@@ -1009,8 +1122,8 @@ function load() {
     }
   }
 
-  if (worlds[wi][li].hasOwnProperty('message')) {
-    showBalloon(worlds[wi][li].message.replace(/AND/g, andToken).replace(/OR/g, orToken).replace(/NOT/g, notToken));
+  if (worlds[wi].levels[li].hasOwnProperty('message')) {
+    showBalloon(localize(worlds[wi].levels[li].message));
   } else {
     hideBalloon();
   }
