@@ -1,0 +1,49 @@
+#levelName {
+  font-size: 24pt;
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.gridtitle {
+  font-size: 24pt;
+  font-family: sans-serif;
+}
+
+.gridpanel {
+  text-align: center;
+}
+
+#main {
+  clear: both;
+  margin-left: auto;
+  margin-right: auto;
+  width: 1000px;
+}
+
+.grid {
+  width: 450px;
+  height: 450px;
+  text-align: center;
+}
+
+#info {
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 18pt;
+  margin-bottom: 10px;
+}
+
+#guess {
+  clear: both;
+  width: 100%;
+  font-size: 24px;
+  font-family: 'Courier';
+}
+
+#percentage {
+  float: right;
+  color: red;
+  font-size: 14px;
+  margin-bottom: 5px;
+  margin-right: 0px;
+}
