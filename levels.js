@@ -32,7 +32,7 @@ var worlds = [];
   levels.push({name: 'Tracks', configuration: '0100000000101000000001010000000010100000000101000000001010000000010100000000101000000001010000000010'});
   levels.push({name: 'Rank and File', configuration: '1101111111000000000011011111111101111111110111111111011111111101111111110111111111011111111101111111'});
   levels.push({name: 'Groups', configuration: '0101010101000000000001010101010101010101010101010100000000000101010101010101010101010101010000000000'});
-  worlds.push({levels: levels, message: "This game seems to be your BRED and butter! Are you ready to help the next generation? If so, hit Enter."});
+  worlds.push({levels: levels, message: "This game seems to be your BRED and butter! Are you ready to help the litters Generation 2 be born? Mom and Dad are looking to have some stranger litters, but they don't require any new operations. If you're ready, hit Enter."});
 }
 {
   var levels = [];
@@ -56,7 +56,7 @@ var worlds = [];
   levels.push({name: 'Unoriginal', configuration: '0111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111'});
   levels.push({name: 'Sample', configuration: '1111111111111111111111111111110000111111111111111111111111111111111111111111111111111111111111111111'});
   levels.push({name: 'Square', configuration: '1111111111100000000110000000011000000001100000000110000000011000000001100000000110000000011111111111'});
-  worlds.push({levels: levels, message: "asfsd"});
+  worlds.push({levels: levels, message: "Generation 2 is alive and kicking! Are you ready for Generation 3? For these litters, you'll need some advanced tools of the trade, like bitwise operators and the functions <code>abs</code>, <code>min</code>, and <code>max</code>. Expect frustration and difficulty! Hit Enter to proceed."});
 }
 {
   var levels = [];
@@ -81,5 +81,5 @@ var worlds = [];
   levels.push({name: 'Stairing Contest', configuration: '0000111100001111000011110000111100001111000011110000111100001111000011110000111100001111000011110000'});
   levels.push({name: 'Glasses', configuration: '0000000000000000000000000000000000000111000000111100000011110000110001000111000100011100010001111110'});
   levels.push({name: 'Russian', configuration: '1111111111100000000010111111101010000010101011101010101010101010111010101000001010111111101000000000'});
-  worlds.push({levels: levels, message: "12321"});
+  worlds.push({levels: levels, message: "Mom and Dad have decided enough is enough. No more kids. Your years of employment have come to an end. But good news! You have been allotted a share in their will, which when distributed amongst all their children and you, works out to about 1/1000000th of their estate. Hit Enter to start over."});
 }
