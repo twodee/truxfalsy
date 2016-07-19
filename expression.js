@@ -248,8 +248,8 @@ function ExpressionNegative(r) {
   this.r = r;
   this.evaluate = function(env) {
     var rr = r.evaluate(env); 
-    if (!rr.isInteger) throw '<code>-</code> exprects an integer operand.';
-    return new ExpressionInteger(-rr);
+    if (!rr.isInteger) throw '<code>-</code> expects an integer operand.';
+    return new ExpressionInteger(-rr.toInteger());
   }
 }
 
