@@ -37,7 +37,7 @@ function hideBalloon() {
 var intro = [
   {selector: 'body', message: 'Welcome to Trux Falsy, a game where Space and Logic marry and have somewhere between 0 and 100 kids. You, a gene therapist, will help them have the ones they want. Click in this box to proceed.'},
   {selector: '#expectedGrid', message: 'On the left you see the kids they want to have. They are brightly colored. Each lives at a particular two-dimensional location.'},
-  {selector: '#bookmark82', message: 'For example, this kid\'s x-coordinate is 2 and it\'s y-coordinate is 8.'},
+  {selector: '#bookmark82', message: 'For example, this kid\'s x-coordinate is 2 and its y-coordinate is 8.'},
   {selector: '#actualGrid', message: 'On the right are the kids that will actually be born given the couple\'s current Genetic Expression.'},
   {selector: '#guess', message: 'In the box above, enter a Genetic Expression using the language of logic&mdash;that is, in terms of <code>x</code>, <code>y</code>, and various operators that you will learn about. For example, <code>y &gt;= 8</code> causes the top two rows to be born. Operators <code>&lt;</code>, <code>&lt;=</code>, and <code>&gt;</code> are also available. Express x and y values only for the kids shown in Expected.'},
 ];
