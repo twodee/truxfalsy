@@ -3,17 +3,28 @@
 
 <head>
   <title>Trux Falsy</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <script src="jquery.balloon.min.js"></script>
   <script src="levels.js"></script>
   <script src="token.js"></script>
   <script src="lexer.js"></script>
   <script src="expression.js"></script>
   <script src="parser.js"></script>
-  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+  <div id="menu">
+    <img src="gear_lo.png" width="50" id="gear">
+  </div>
+
+  <div id="settings" title="Unlocked Levels">
+  </div>
+
   <div id="main">
     <h1 id="levelName" style="clear: both">Level Name</h1>
 

@@ -2,6 +2,7 @@ var isShown = false;
 var pendingMessage = null;
 
 function showBalloon(msg) {
+  console.log(msg + ' == ' + isShown);
   if (isShown) {
     pendingMessage = msg;
     hideBalloon();
@@ -98,12 +99,8 @@ function advanceIntro() {
 
 $(document).ready(function() {
   if (typeof(Storage) !== 'undefined') {
-    if (localStorage.getItem('world') === null || localStorage.getItem('level') === null) {
-      state.world = 0;
-      state.level = 0;
-    } else {
-      state.world = parseInt(localStorage.getItem('world'));
-      state.level = parseInt(localStorage.getItem('level'));
+    if (localStorage.getItem('state') !== null) {
+      state = JSON.parse(localStorage.getItem('state'));
     }
     console.log(state);
   } else {
@@ -126,11 +123,47 @@ $(document).ready(function() {
   bookmark82.style.width = rect.width + 'px';
   bookmark82.style.height = rect.height + 'px';
   $('body').append(bookmark82);
+
+  $('#gear').click(showUnlockedLevels);
+  $('#settings').dialog({
+    modal: true,
+    autoOpen: false,
+    maxHeight: 0.75 * $('body').height()
+  });
+
+  $('#gear').hover(function() {
+    $(this).attr('src', 'gear_hi.png');
+  }, function() {
+    $(this).attr('src', 'gear_lo.png');
+  });
   
-  if (state.world == 0 && state.level == 0) {
+  if (state.currentWorld == 0 && state.currentLevel == 0) {
     advanceIntro();
   }
 });
+
+function showUnlockedLevels() {
+  var list = '<ul>'
+  for (var world = 0; world <= state.maxWorld; ++world) {
+    var nlevels = world == state.maxWorld ? state.maxLevel : worlds[world].levels.length - 1;
+    for (var level = 0; level <= nlevels; ++level) {
+      list += '<li><a href="#" onclick="jumpToLevel(' + world + ', ' + level + ')">Generation ' + world + ', Level ' + level + '</a></li>';
+    }
+  }
+  list += '</ul>';
+  $('#settings').html(list);
+  $('#settings').dialog('open');
+}
+
+function jumpToLevel(world, level) {
+  $('#settings').dialog('close');
+  
+  state.currentWorld = world;
+  state.currentLevel = level;
+  load();
+
+  return false;
+}
 
 var topTrueColor =  'hsl(306, 100%, 74%)';
 var bottomTrueColor = 'hsl(306, 100%, 64%)';
@@ -157,7 +190,9 @@ document.getElementById('guess').onkeypress = function(e) {
 var nRight = 0;
 
 function showGuess() {
+  console.log('showing guess!');
   var src = document.getElementById('guess').value;
+  state['solution-' + state.currentWorld + '-' + state.currentLevel] = src;
 
   if (src == '') {
     document.getElementById('percentage').innerHTML = '&nbsp;';
@@ -193,7 +228,7 @@ function showGuess() {
         }
 
         var wrong = document.getElementById('wrong' + i);    
-        if (result.isBoolean && result.toBoolean() === leval(state.world, state.level, x, y)) {
+        if (result.isBoolean && result.toBoolean() === leval(state.currentWorld, state.currentLevel, x, y)) {
           wrong.style['stroke-opacity'] = 0.0;
           ++nRight;
         } else {
@@ -202,20 +237,12 @@ function showGuess() {
       }
     }
 
+    console.log(nRight);
     document.getElementById('percentage').innerHTML = nRight + '/100 right';
     if (nRight == 100) {
-      if (state.level == worlds[state.world].levels.length - 1) {
-        showBalloon(localize(worlds[state.world].message));
+      if (state.currentLevel == worlds[state.currentWorld].levels.length - 1) {
+        showBalloon(localize(worlds[state.currentWorld].message));
       } else {
-        if (state.level == worlds[state.world].levels.length - 1) {
-          state.world = (state.world + 1) % worlds.length;
-          state.level = 0;
-        } else {
-          ++state.level;
-        }
-
-        localStorage.world = state.world;
-        localStorage.level = state.level;
         showBalloon('Got \'em! Hit Enter for the next litter.');
       }
     }
@@ -223,12 +250,29 @@ function showGuess() {
     document.getElementById('percentage').innerHTML = localize(e);
   }
 
+  localStorage.setItem('state', JSON.stringify(state));
+
   return true;
 }
 
 function next() {
   document.getElementById('percentage').innerHTML = '&nbsp;';
   document.getElementById('guess').value = ''; 
+
+  if (state.currentLevel == worlds[state.currentWorld].levels.length - 1) {
+    state.currentWorld = (state.currentWorld + 1) % worlds.length;
+    state.currentLevel = 0;
+  } else {
+    ++state.currentLevel;
+  }
+  
+  if (state.currentWorld > state.maxWorld || (state.currentWorld == state.maxWorld && state.currentLevel > state.maxLevel)) {
+    state.maxWorld = state.currentWorld;
+    state.maxLevel = state.currentLevel;
+  }
+
+  localStorage.setItem('state', JSON.stringify(state));
+
   load();
 }
 
@@ -293,10 +337,8 @@ text = createTextNode('x', leftMargin + 4.5 * tileDiameter + tileRadius, gridHei
 document.getElementById('actualGrid').appendChild(text);
 
 text = createTextNode('y', charWidth * 0.5, gridHeight - bottomMargin - 4.5 * tileDiameter - tileRadius);
-//text.setAttributeNS(null, 'transform', 'rotate(-90 ' + (charWidth * 0.5) + ' ' + (gridHeight - bottomMargin - 4.5 * tileDiameter - tileRadius) + ')');
 document.getElementById('expectedGrid').appendChild(text);
 text = createTextNode('y', charWidth * 0.5, gridHeight - bottomMargin - 4.5 * tileDiameter - tileRadius);
-//text.setAttributeNS(null, 'transform', 'rotate(-90 ' + (charWidth * 0.5) + ' ' + (gridHeight - bottomMargin - 4.5 * tileDiameter - tileRadius) + ')');
 document.getElementById('actualGrid').appendChild(text);
 
 for (var y = 0; y < 10; ++y) {
@@ -341,12 +383,14 @@ function leval(world, level, x, y) {
 }
 
 var state = new Object();
-state.world = 0;
-state.level = 0;
+state.currentWorld = 0;
+state.currentLevel = 0;
+state.maxWorld = 0;
+state.maxLevel = 0;
 
 function load() {
   nRight = 0;
-  document.getElementById('levelName').innerHTML = 'Generation ' + state.world + ', Litter ' + state.level;
+  document.getElementById('levelName').innerHTML = 'Generation ' + state.currentWorld + ', Litter ' + state.currentLevel;
   for (var y = 0; y < 10; ++y) {
     for (var x = 0; x < 10; ++x) {
       var i = y * 10 + x;
@@ -354,7 +398,7 @@ function load() {
       var expectedBottom = document.getElementById('expectedBottom' + i);
       var actualTop = document.getElementById('actualTop' + i);
       var actualBottom = document.getElementById('actualBottom' + i);
-      if (leval(state.world, state.level, x, y)) {
+      if (leval(state.currentWorld, state.currentLevel, x, y)) {
         expectedTop.style.fill = topTrueColor;
         expectedBottom.style.fill = bottomTrueColor;
       } else {
@@ -368,8 +412,19 @@ function load() {
     }
   }
 
-  if (worlds[state.world].levels[state.level].hasOwnProperty('message')) {
-    showBalloon(localize(worlds[state.world].levels[state.level].message));
+  var key = 'solution-' + state.currentWorld + '-' + state.currentLevel;
+  console.log(key);
+  if (key in state) {
+    var src = document.getElementById('guess');
+    if (state[key].length > 0) {
+      src.value = state[key];
+      hideBalloon();
+      showGuess();
+    }
+  }
+
+  if (worlds[state.currentWorld].levels[state.currentLevel].hasOwnProperty('message')) {
+    showBalloon(localize(worlds[state.currentWorld].levels[state.currentLevel].message));
   } else {
     hideBalloon();
   }
