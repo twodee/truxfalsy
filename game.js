@@ -41,11 +41,11 @@ var intro = [
   {selector: '#actualGrid', message: 'On the right are the kids that will actually be born given the couple\'s current Genetic Expression.'},
   {selector: '#guess', message: 'In the box above, enter a Genetic Expression using the language of logic&mdash;that is, in terms of <code>x</code>, <code>y</code>, and various operators that you will learn about. For example, <code>y &gt;= 8</code> causes the top two rows to be born. Operators <code>&lt;</code>, <code>&lt;=</code>, and <code>&gt;</code> are also available. Express x and y values only for the kids shown in Expected.'},
 ];
-var ii = 0;
+var iIntro = 0;
 
 function advanceIntro() {
-  if (ii > 0) {
-    $(intro[ii].selector).hideBalloon();
+  if (iIntro > 0) {
+    $(intro[iIntro].selector).hideBalloon();
   }
 
   var offsetX = 0;
@@ -53,27 +53,27 @@ function advanceIntro() {
   var position = "bottom";
   var width = 0;
 
-  if (ii == 0) {
+  if (iIntro == 0) {
     width = 500;
     position = null;
-  } else if (ii == 2) {
+  } else if (iIntro == 2) {
     width = 250;
   } else {
-    width = $(intro[ii].selector).width();
+    width = $(intro[iIntro].selector).width();
   }
 
-  if (ii == intro.length - 1) {
-    showBalloon(intro[ii].message);
+  if (iIntro == intro.length - 1) {
+    showBalloon(intro[iIntro].message);
   } else {
-    $(intro[ii].selector).showBalloon({
+    $(intro[iIntro].selector).showBalloon({
       position: position,
       offsetX: offsetX,
       offsetY: offsetY,
-      tipSize: ii == 0 ? 0 : 10,
+      tipSize: iIntro == 0 ? 0 : 10,
       html: true,
       minLifetime: 0,
       hideComplete: function() {
-        ++ii;
+        ++iIntro;
         advanceIntro();
       },
       css: {
@@ -82,13 +82,13 @@ function advanceIntro() {
         width: width
       },
       classname: 'balloon',
-      contents: localize(intro[ii].message),
+      contents: localize(intro[iIntro].message),
     });
   }
 
-  if (ii < intro.length - 1) {
+  if (iIntro < intro.length - 1) {
     $('.balloon').on('click', function() {
-      $(intro[ii].selector).hideBalloon();
+      $(intro[iIntro].selector).hideBalloon();
     });
   } else {
     $('.balloon').off('click');
@@ -97,6 +97,19 @@ function advanceIntro() {
 }
 
 $(document).ready(function() {
+  if (typeof(Storage) !== 'undefined') {
+    if (localStorage.getItem('world') === null || localStorage.getItem('level') === null) {
+      state.world = 0;
+      state.level = 0;
+    } else {
+      state.world = parseInt(localStorage.getItem('world'));
+      state.level = parseInt(localStorage.getItem('level'));
+    }
+    console.log(state);
+  } else {
+    alert('Trux Falsy requires a web browser that supports HTML5. Without it, your progress cannot be saved.');
+  }
+
   load();
 
   var node82 = document.getElementById('expectedBottom82');
@@ -114,7 +127,9 @@ $(document).ready(function() {
   bookmark82.style.height = rect.height + 'px';
   $('body').append(bookmark82);
   
-  advanceIntro();
+  if (state.world == 0 && state.level == 0) {
+    advanceIntro();
+  }
 });
 
 var topTrueColor =  'hsl(306, 100%, 74%)';
@@ -178,7 +193,7 @@ function showGuess() {
         }
 
         var wrong = document.getElementById('wrong' + i);    
-        if (result.isBoolean && result.toBoolean() === leval(wi, li, x, y)) {
+        if (result.isBoolean && result.toBoolean() === leval(state.world, state.level, x, y)) {
           wrong.style['stroke-opacity'] = 0.0;
           ++nRight;
         } else {
@@ -189,9 +204,18 @@ function showGuess() {
 
     document.getElementById('percentage').innerHTML = nRight + '/100 right';
     if (nRight == 100) {
-      if (li == worlds[wi].levels.length - 1) {
-        showBalloon(localize(worlds[wi].message));
+      if (state.level == worlds[state.world].levels.length - 1) {
+        showBalloon(localize(worlds[state.world].message));
       } else {
+        if (state.level == worlds[state.world].levels.length - 1) {
+          state.world = (state.world + 1) % worlds.length;
+          state.level = 0;
+        } else {
+          ++state.level;
+        }
+
+        localStorage.world = state.world;
+        localStorage.level = state.level;
         showBalloon('Got \'em! Hit Enter for the next litter.');
       }
     }
@@ -204,12 +228,6 @@ function showGuess() {
 
 function next() {
   document.getElementById('percentage').innerHTML = '&nbsp;';
-  if (li == worlds[wi].levels.length - 1) {
-    wi = (wi + 1) % worlds.length;
-    li = 0;
-  } else {
-    ++li;
-  }
   document.getElementById('guess').value = ''; 
   load();
 }
@@ -318,16 +336,17 @@ for (var y = 0; y < 10; ++y) {
   }
 }
 
-function leval(wi, li, x, y) {
-  return worlds[wi].levels[li].configuration.charAt(y * 10 + x) == '1';
+function leval(world, level, x, y) {
+  return worlds[world].levels[level].configuration.charAt(y * 10 + x) == '1';
 }
 
-var wi = 0;
-var li = 0;
+var state = new Object();
+state.world = 0;
+state.level = 0;
 
 function load() {
   nRight = 0;
-  document.getElementById('levelName').innerHTML = 'Generation ' + wi + ', Litter ' + li + ': ' + worlds[wi].levels[li].name;
+  document.getElementById('levelName').innerHTML = 'Generation ' + state.world + ', Litter ' + state.level;
   for (var y = 0; y < 10; ++y) {
     for (var x = 0; x < 10; ++x) {
       var i = y * 10 + x;
@@ -335,7 +354,7 @@ function load() {
       var expectedBottom = document.getElementById('expectedBottom' + i);
       var actualTop = document.getElementById('actualTop' + i);
       var actualBottom = document.getElementById('actualBottom' + i);
-      if (leval(wi, li, x, y)) {
+      if (leval(state.world, state.level, x, y)) {
         expectedTop.style.fill = topTrueColor;
         expectedBottom.style.fill = bottomTrueColor;
       } else {
@@ -349,8 +368,8 @@ function load() {
     }
   }
 
-  if (worlds[wi].levels[li].hasOwnProperty('message')) {
-    showBalloon(localize(worlds[wi].levels[li].message));
+  if (worlds[state.world].levels[state.level].hasOwnProperty('message')) {
+    showBalloon(localize(worlds[state.world].levels[state.level].message));
   } else {
     hideBalloon();
   }
