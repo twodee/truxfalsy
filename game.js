@@ -26,8 +26,41 @@ function showBalloon(msg) {
       contents: msg,
     });
 
+    console.log('showing ' + msg);
+
     isShown = true;
   }
+}
+
+function onLevelEnd() {
+  hideBalloon();
+
+  // Show level end message square in the middle to distinguish one
+  // level from another.
+  $('body').showBalloon({
+    position: null,
+    offsetX: 0,
+    offsetY: 0,
+    tipSize: 0,
+    html: true,
+    minLifetime: 0,
+    hideComplete: function() {
+    },
+    css: {
+      fontSize: '18pt',
+      fontFamily: 'sans-serif',
+      width: 500
+    },
+    classname: 'balloon',
+    contents: localize(worlds[state.currentWorld].message),
+  });
+
+  // Click to go on to next generation.
+  $('.balloon').on('click', function() {
+    $('body').hideBalloon();
+    $('.balloon').off('click');
+    next();
+  });
 }
 
 function hideBalloon() {
@@ -37,11 +70,11 @@ function hideBalloon() {
 
 var intro = [
   {selector: 'body', message: 'Welcome to Trux Falsy, a game where Space and Logic marry and have somewhere between 0 and 100 kids. You, a gene therapist, will help them have the ones they want. Click in this box to proceed.', position: null, width: 500},
-  {selector: '#expectedGrid', message: 'On the left you see highlighted the kids they want to have. Each has a particular XY chromosome.'},
-  {selector: '#bookmark82', message: 'For example, this kid\'s X chromosome is 2 and its Y chromosome is 8. The eager parents want this kid to be born.', width: 250, position: 'bottom'},
-  {selector: '#bookmark37', message: 'Check out this kid. It\'s X chromosome is 7 and its Y chromosome is 3. The eager parents do not yet want this kid to be born. But don\'t feel too bad. In future litters, kid 7-3 will see the light of day.', width: 250, position: 'top'},
+  {selector: '#expectedGrid', message: 'On the left you see highlighted the kids they want to have. Each has a particular <code>xy</code> chromosome.'},
+  {selector: '#bookmark82', message: 'For example, this kid\'s <code>x</code> chromosome is 2 and its <code>y</code> chromosome is 8. The eager parents want this kid to be born.', width: 250, position: 'bottom'},
+  {selector: '#bookmark37', message: 'Check out this kid. Its <code>x</code> chromosome is 7 and its <code>y</code> chromosome is 3. The eager parents do not yet want this kid to be born. But don\'t feel too bad. In future litters, kid 7-3 will see the light of day.', width: 250, position: 'top'},
   {selector: '#actualGrid', message: 'On the right are the kids that will actually be born given the couple\'s current Genetic Expression, which you craft.'},
-  {selector: '#guess', message: 'In the box above, enter a Genetic Expression using the language of logic&mdash;that is, in terms of <code>x</code>, <code>y</code>, and various operators that you will learn about. For example, <code>y &gt;= 8</code> causes the top two rows to be born. Operators <code>&lt;</code>, <code>&lt;=</code>, and <code>&gt;</code> are also available. Express x and y values only for the kids shown in Expected.'},
+  {selector: '#guess', message: 'In the box above, enter a Genetic Expression that selects out all the kids whose <code>x</code> chromosome is less than 5 by typing <code>x &lt; 5</code>.'},
 ];
 var iIntro = 0;
 
@@ -107,6 +140,11 @@ $(document).ready(function() {
     if (localStorage.getItem('state') !== null) {
       state = JSON.parse(localStorage.getItem('state'));
     }
+    if (state.currentWorld < 0 || state.currentWorld >= worlds.length ||
+        state.currentLevel < 0 || state.currentLevel >= worlds[state.currentWorld].levels.length) {
+      state.currentWorld = 0;
+      state.currentLevel = 0;
+    }
     console.log(state);
   } else {
     alert('Trux Falsy requires a web browser that supports HTML5. Without it, your progress cannot be saved.');
@@ -154,10 +192,6 @@ $(document).ready(function() {
   }, function() {
     $(this).attr('src', 'gear_lo.png');
   });
-  
-  if (state.currentWorld == 0 && state.currentLevel == 0) {
-    advanceIntro();
-  }
 });
 
 function showUnlockedLevels() {
@@ -194,6 +228,7 @@ var bottomFalseColor = 'hsl(0, 0%, 85%)';
 // s -> String to convert.
 // <- String with placeholders replaced by language tokens.
 function localize(s) {
+  console.log(s);
   return s.replace(/AND/g, andToken).replace(/OR/g, orToken).replace(/NOT/g, notToken);
 }
 
@@ -201,7 +236,11 @@ document.getElementById('guess').onkeypress = function(e) {
   if (!e) e = window.event;
   var keyCode = e.keyCode || e.which;
   if (keyCode == '13' && nRight == 100) {
-    next(); 
+    if (state.currentLevel == worlds[state.currentWorld].levels.length - 1) {
+      onLevelEnd();
+    } else {
+      next(); 
+    }
   }
 }
 
@@ -258,14 +297,10 @@ function showGuess() {
     console.log(nRight);
     document.getElementById('percentage').innerHTML = nRight + '/100 right';
     if (nRight == 100) {
-      if (state.currentLevel == worlds[state.currentWorld].levels.length - 1) {
-        showBalloon(localize(worlds[state.currentWorld].message));
-      } else {
-        showBalloon('Got \'em! Hit Enter for the next litter.');
-      }
+      showBalloon('Got \'em! Hit Enter to continue.');
     }
   } catch (e) {
-    document.getElementById('percentage').innerHTML = localize(e);
+    document.getElementById('percentage').innerHTML = localize('' + e);
   }
 
   localStorage.setItem('state', JSON.stringify(state));
@@ -397,7 +432,11 @@ for (var y = 0; y < 10; ++y) {
 }
 
 function leval(world, level, x, y) {
-  return worlds[world].levels[level].configuration.charAt(y * 10 + x) == '1';
+  if (world >= 0 && world < worlds.length && level >= 0 && level < worlds[world].levels.length) {
+    return worlds[world].levels[level].configuration.charAt(y * 10 + x) == '1';
+  } else {
+    return false;
+  }
 }
 
 var state = new Object();
@@ -436,14 +475,20 @@ function load() {
     var src = document.getElementById('guess');
     if (state[key].length > 0) {
       src.value = state[key];
-      hideBalloon();
+      // hideBalloon();
       showGuess();
     }
   }
 
-  if (worlds[state.currentWorld].levels[state.currentLevel].hasOwnProperty('message')) {
-    showBalloon(localize(worlds[state.currentWorld].levels[state.currentLevel].message));
-  } else {
-    hideBalloon();
+  if (nRight != 100) {
+    if (state.currentWorld == 0 && state.currentLevel == 0) {
+      advanceIntro();
+    }
+
+    if (worlds[state.currentWorld].levels[state.currentLevel].hasOwnProperty('message')) {
+      showBalloon(localize(worlds[state.currentWorld].levels[state.currentLevel].message));
+    } else {
+      hideBalloon();
+    }
   }
 }
