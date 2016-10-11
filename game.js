@@ -194,14 +194,21 @@ $(document).ready(function() {
   });
 });
 
+function reset() {
+  localStorage.removeItem('state');
+  $('#settings').dialog('close');
+  return false;
+}
+
 function showUnlockedLevels() {
-  var list = '<ul>'
+  var list = '<h4>Levels</h4><ul>'
   for (var world = 0; world <= state.maxWorld; ++world) {
     var nlevels = world == state.maxWorld ? state.maxLevel : worlds[world].levels.length - 1;
     for (var level = 0; level <= nlevels; ++level) {
       list += '<li><a href="#" onclick="jumpToLevel(' + world + ', ' + level + ')">Generation ' + world + ', Level ' + level + '</a></li>';
     }
   }
+  list += '<li><a href="#" onclick="reset()">Reset</a></li>';
   list += '</ul>';
   $('#settings').html(list);
   $('#settings').dialog('open');
