@@ -128,15 +128,6 @@ function advanceIntro() {
     });
   }
 
-  // if (iIntro < intro.length - 1) {
-    // $('balloon').on('click', function() {
-      // $(intro[iIntro].selector).hideBalloon();
-    // });
-  // } else {
-    // $('.balloon').off('click');
-    // document.getElementById('guess').focus();
-  // }
-
   if (iIntro < intro.length - 1) {
     $('body').on('keyup', function(e) {
       if (!e) e = window.event;
@@ -351,12 +342,9 @@ function showGuess() {
     document.getElementById('percentage').innerHTML = nRight + '/100 right';
     if (nRight == 100) {
       showBalloon('Got \'em! Hit Enter to continue.');
-    } else {
-      hideBalloon();
     }
   } catch (e) {
     document.getElementById('percentage').innerHTML = localize('' + e);
-    hideBalloon();
   }
 
   localStorage.setItem('state', JSON.stringify(state));

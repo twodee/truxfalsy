@@ -53,7 +53,7 @@
 }
 
 h3.levelcomplete {
-  color: #FFA500;
+  color: hsl(306, 100%, 64%);
   margin-top: 5px;
   margin-bottom: 5px;
   text-align: center;
