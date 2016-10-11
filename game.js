@@ -55,12 +55,14 @@ function onLevelEnd() {
     contents: localize(worlds[state.currentWorld].message),
   });
 
-  // Click to go on to next generation.
-  $('.balloon').on('click', function() {
-    $('body').hideBalloon();
-    $('.balloon').off('click');
-    next();
-  });
+  if (document.activeElement) {
+    document.activeElement.blur();
+  }
+
+  // Hit Enter to go on to the next generation.
+  $('body').on('keyup', handleKey);
+  
+  return false;
 }
 
 function hideBalloon() {
@@ -69,10 +71,10 @@ function hideBalloon() {
 }
 
 var intro = [
-  {selector: 'body', message: 'Welcome to Trux Falsy, a game where Space and Logic marry and have somewhere between 0 and 100 kids. You, a gene therapist, will help them have the ones they want. Click in this box to proceed.', position: null, width: 500},
+  {selector: 'body', message: 'Welcome to Trux Falsy, a game where Space and Logic marry and have somewhere between 0 and 100 kids. You, a gene therapist, will help them have the ones they want. Hit Enter to proceed.', position: null, width: 500},
   {selector: '#expectedGrid', message: 'On the left you see highlighted the kids they want to have. Each has a particular <code>xy</code> chromosome.'},
-  {selector: '#bookmark82', message: 'For example, this kid\'s <code>x</code> chromosome is 2 and its <code>y</code> chromosome is 8. The eager parents want this kid to be born.', width: 250, position: 'bottom'},
-  {selector: '#bookmark37', message: 'Check out this kid. Its <code>x</code> chromosome is 7 and its <code>y</code> chromosome is 3. The eager parents do not yet want this kid to be born. But don\'t feel too bad. In future litters, kid 7-3 will see the light of day.', width: 250, position: 'top'},
+  {selector: '#bookmark82', message: 'For example, this kid\'s <code>x</code> chromosome is 2 and its <code>y</code> chromosome is 8. The eager parents want this kid to be born.', width: 250, position: 'bottom', offsetY: 15},
+  {selector: '#bookmark37', message: 'Check out this kid. Its <code>x</code> chromosome is 7 and its <code>y</code> chromosome is 3. The eager parents aren\'t yet ready for this kid to be born. But don\'t feel too bad. In future litters, kid 7-3 will see the light of day.', width: 250, position: 'top', offsetY: -15},
   {selector: '#actualGrid', message: 'On the right are the kids that will actually be born given the couple\'s current Genetic Expression, which you craft.'},
   {selector: '#guess', message: 'In the box above, enter a Genetic Expression that selects out all the kids whose <code>x</code> chromosome is less than 5 by typing <code>x &lt; 5</code>.'},
 ];
@@ -83,8 +85,8 @@ function advanceIntro() {
     $(intro[iIntro].selector).hideBalloon();
   }
 
-  var offsetX = 0;
-  var offsetY = 0;
+  var offsetX = intro[iIntro].hasOwnProperty('offsetX') ? intro[iIntro].offsetX : 0;
+  var offsetY = intro[iIntro].hasOwnProperty('offsetY') ? intro[iIntro].offsetY : 0;
   var width = 0;
 
   var width;
@@ -125,12 +127,21 @@ function advanceIntro() {
     });
   }
 
+  // if (iIntro < intro.length - 1) {
+    // $('balloon').on('click', function() {
+      // $(intro[iIntro].selector).hideBalloon();
+    // });
+  // } else {
+    // $('.balloon').off('click');
+    // document.getElementById('guess').focus();
+  // }
+
   if (iIntro < intro.length - 1) {
-    $('.balloon').on('click', function() {
+    $('body').on('keyup', function() {
       $(intro[iIntro].selector).hideBalloon();
     });
   } else {
-    $('.balloon').off('click');
+    $('body').off('keyup');
     document.getElementById('guess').focus();
   }
 }
@@ -197,6 +208,7 @@ $(document).ready(function() {
 function reset() {
   localStorage.removeItem('state');
   $('#settings').dialog('close');
+  location.reload();
   return false;
 }
 
@@ -239,15 +251,29 @@ function localize(s) {
   return s.replace(/AND/g, andToken).replace(/OR/g, orToken).replace(/NOT/g, notToken);
 }
 
-document.getElementById('guess').onkeypress = function(e) {
+document.getElementById('guess').onkeyup = function(e) {
   if (!e) e = window.event;
   var keyCode = e.keyCode || e.which;
   if (keyCode == '13' && nRight == 100) {
+    console.log('got guess enter');
     if (state.currentLevel == worlds[state.currentWorld].levels.length - 1) {
       onLevelEnd();
     } else {
       next(); 
     }
+    e.stopPropagation();
+  }
+}
+
+function handleKey(e) {
+  console.log('handling key');
+  console.log(e);
+  if (!e) e = window.event;
+  var keyCode = e.keyCode || e.which;
+  if (keyCode == '13') {
+    $('body').hideBalloon();
+    $('body').off('keyup');
+    next();
   }
 }
 
@@ -482,6 +508,7 @@ function load() {
     var src = document.getElementById('guess');
     if (state[key].length > 0) {
       src.value = state[key];
+      src.focus();
       // hideBalloon();
       showGuess();
     }
