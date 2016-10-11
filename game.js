@@ -36,10 +36,11 @@ function hideBalloon() {
 }
 
 var intro = [
-  {selector: 'body', message: 'Welcome to Trux Falsy, a game where Space and Logic marry and have somewhere between 0 and 100 kids. You, a gene therapist, will help them have the ones they want. Click in this box to proceed.'},
-  {selector: '#expectedGrid', message: 'On the left you see the kids they want to have. They are brightly colored. Each lives at a particular two-dimensional location.'},
-  {selector: '#bookmark82', message: 'For example, this kid\'s x-coordinate is 2 and its y-coordinate is 8.'},
-  {selector: '#actualGrid', message: 'On the right are the kids that will actually be born given the couple\'s current Genetic Expression.'},
+  {selector: 'body', message: 'Welcome to Trux Falsy, a game where Space and Logic marry and have somewhere between 0 and 100 kids. You, a gene therapist, will help them have the ones they want. Click in this box to proceed.', position: null, width: 500},
+  {selector: '#expectedGrid', message: 'On the left you see highlighted the kids they want to have. Each has a particular XY chromosome.'},
+  {selector: '#bookmark82', message: 'For example, this kid\'s X chromosome is 2 and its Y chromosome is 8. The eager parents want this kid to be born.', width: 250, position: 'bottom'},
+  {selector: '#bookmark37', message: 'Check out this kid. It\'s X chromosome is 7 and its Y chromosome is 3. The eager parents do not yet want this kid to be born. But don\'t feel too bad. In future litters, kid 7-3 will see the light of day.', width: 250, position: 'top'},
+  {selector: '#actualGrid', message: 'On the right are the kids that will actually be born given the couple\'s current Genetic Expression, which you craft.'},
   {selector: '#guess', message: 'In the box above, enter a Genetic Expression using the language of logic&mdash;that is, in terms of <code>x</code>, <code>y</code>, and various operators that you will learn about. For example, <code>y &gt;= 8</code> causes the top two rows to be born. Operators <code>&lt;</code>, <code>&lt;=</code>, and <code>&gt;</code> are also available. Express x and y values only for the kids shown in Expected.'},
 ];
 var iIntro = 0;
@@ -51,16 +52,20 @@ function advanceIntro() {
 
   var offsetX = 0;
   var offsetY = 0;
-  var position = "bottom";
   var width = 0;
 
-  if (iIntro == 0) {
-    width = 500;
-    position = null;
-  } else if (iIntro == 2) {
-    width = 250;
+  var width;
+  if (intro[iIntro].hasOwnProperty('width')) {
+    width = intro[iIntro].width;
   } else {
     width = $(intro[iIntro].selector).width();
+  }
+
+  var position;
+  if (intro[iIntro].hasOwnProperty('position')) {
+    position = intro[iIntro].position;
+  } else {
+    position = 'bottom';
   }
 
   if (iIntro == intro.length - 1) {
@@ -70,7 +75,7 @@ function advanceIntro() {
       position: position,
       offsetX: offsetX,
       offsetY: offsetY,
-      tipSize: iIntro == 0 ? 0 : 10,
+      tipSize: iIntro == 0 ? 0 : 20,
       html: true,
       minLifetime: 0,
       hideComplete: function() {
@@ -109,12 +114,12 @@ $(document).ready(function() {
 
   load();
 
-  var node82 = document.getElementById('expectedBottom82');
-  var rect = node82.getBoundingClientRect();
-
   // Let's create a div to overlay kid 82 in the expected SVG grid. We need one
   // because we want to put a balloon under that kid during the tutorial, but
   // the balloon library doesn't like attaching to non-DOM SVG elements.
+  var node82 = document.getElementById('expectedBottom82');
+  var rect = node82.getBoundingClientRect();
+
   var bookmark82 = document.createElement("div");
   bookmark82.id = 'bookmark82';
   bookmark82.style.position = 'absolute';
@@ -123,6 +128,19 @@ $(document).ready(function() {
   bookmark82.style.width = rect.width + 'px';
   bookmark82.style.height = rect.height + 'px';
   $('body').append(bookmark82);
+
+  // Let's do something similar for an unhighlighted child, say 37.
+  var node37 = document.getElementById('expectedTop37');
+  var rect = node37.getBoundingClientRect();
+
+  var bookmark37 = document.createElement("div");
+  bookmark37.id = 'bookmark37';
+  bookmark37.style.position = 'absolute';
+  bookmark37.style.left = rect.left + 'px';
+  bookmark37.style.top = (rect.top + window.scrollY) + 'px';
+  bookmark37.style.width = rect.width + 'px';
+  bookmark37.style.height = rect.height + 'px';
+  $('body').append(bookmark37);
 
   $('#gear').click(showUnlockedLevels);
   $('#settings').dialog({
