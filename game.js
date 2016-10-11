@@ -487,6 +487,7 @@ for (var y = 0; y < 10; ++y) {
     wrong.setAttributeNS(null, 'd', 'M' + (leftMargin + x * tileDiameter + tileRadius) + ',' + (gridHeight - bottomMargin - y * tileDiameter - tileRadius) + ' m' + -strikeHalfSide + ',' + -strikeHalfSide + ' l' + strikeSide + ',' + strikeSide + ' m' + -strikeHalfSide + ',' + -strikeHalfSide + ' m' + -strikeHalfSide + ',' + strikeHalfSide + ' l' + strikeSide + ',' + -strikeSide);
     wrong.style['stroke-width'] = 5;
     wrong.style.stroke = '#000000';
+    wrong.style['stroke-opacity'] = 0;
     document.getElementById('actualGrid').appendChild(wrong);
   }
 }
