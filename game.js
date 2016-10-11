@@ -350,7 +350,6 @@ function showGuess() {
 
     document.getElementById('percentage').innerHTML = nRight + '/100 right';
     if (nRight == 100) {
-      console.log('foo');
       showBalloon('Got \'em! Hit Enter to continue.');
     } else {
       hideBalloon();
