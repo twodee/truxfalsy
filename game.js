@@ -2,7 +2,6 @@ var isShown = false;
 var pendingMessage = null;
 
 function showBalloon(msg) {
-  console.log(msg + ' == ' + isShown);
   if (isShown) {
     pendingMessage = msg;
     hideBalloon();
@@ -25,8 +24,6 @@ function showBalloon(msg) {
       },
       contents: msg,
     });
-
-    console.log('showing ' + msg);
 
     isShown = true;
   }
@@ -156,7 +153,6 @@ $(document).ready(function() {
       state.currentWorld = 0;
       state.currentLevel = 0;
     }
-    console.log(state);
   } else {
     alert('Trux Falsy requires a web browser that supports HTML5. Without it, your progress cannot be saved.');
   }
@@ -247,7 +243,6 @@ var bottomFalseColor = 'hsl(0, 0%, 85%)';
 // s -> String to convert.
 // <- String with placeholders replaced by language tokens.
 function localize(s) {
-  console.log(s);
   return s.replace(/AND/g, andToken).replace(/OR/g, orToken).replace(/NOT/g, notToken);
 }
 
@@ -255,7 +250,6 @@ document.getElementById('guess').onkeyup = function(e) {
   if (!e) e = window.event;
   var keyCode = e.keyCode || e.which;
   if (keyCode == '13' && nRight == 100) {
-    console.log('got guess enter');
     if (state.currentLevel == worlds[state.currentWorld].levels.length - 1) {
       onLevelEnd();
     } else {
@@ -266,21 +260,19 @@ document.getElementById('guess').onkeyup = function(e) {
 }
 
 function handleKey(e) {
-  console.log('handling key');
-  console.log(e);
   if (!e) e = window.event;
   var keyCode = e.keyCode || e.which;
   if (keyCode == '13') {
     $('body').hideBalloon();
     $('body').off('keyup');
     next();
+    document.getElementById('guess').focus();
   }
 }
 
 var nRight = 0;
 
 function showGuess() {
-  console.log('showing guess!');
   var src = document.getElementById('guess').value;
   state['solution-' + state.currentWorld + '-' + state.currentLevel] = src;
 
@@ -327,7 +319,6 @@ function showGuess() {
       }
     }
 
-    console.log(nRight);
     document.getElementById('percentage').innerHTML = nRight + '/100 right';
     if (nRight == 100) {
       showBalloon('Got \'em! Hit Enter to continue.');
@@ -503,7 +494,6 @@ function load() {
   }
 
   var key = 'solution-' + state.currentWorld + '-' + state.currentLevel;
-  console.log(key);
   if (key in state) {
     var src = document.getElementById('guess');
     if (state[key].length > 0) {
