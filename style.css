@@ -58,3 +58,7 @@ h3.levelcomplete {
   margin-bottom: 5px;
   text-align: center;
 }
+
+div.levelcomplete {
+  padding: 10px;
+}
