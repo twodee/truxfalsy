@@ -80,6 +80,10 @@ var iIntro = 0;
 function advanceIntro() {
   if (iIntro > 0) {
     $(intro[iIntro].selector).hideBalloon();
+  } else {
+    if (document.activeElement) {
+      document.activeElement.blur();
+    }
   }
 
   var offsetX = intro[iIntro].hasOwnProperty('offsetX') ? intro[iIntro].offsetX : 0;
@@ -134,8 +138,12 @@ function advanceIntro() {
   // }
 
   if (iIntro < intro.length - 1) {
-    $('body').on('keyup', function() {
-      $(intro[iIntro].selector).hideBalloon();
+    $('body').on('keyup', function(e) {
+      if (!e) e = window.event;
+      var keyCode = e.keyCode || e.which;
+      if (keyCode == '13') {
+        $(intro[iIntro].selector).hideBalloon();
+      }
     });
   } else {
     $('body').off('keyup');
@@ -186,6 +194,27 @@ $(document).ready(function() {
   bookmark37.style.width = rect.width + 'px';
   bookmark37.style.height = rect.height + 'px';
   $('body').append(bookmark37);
+
+  // If window resizes, the bookmarks move. We won't try to update
+  // the balloons if they're already displayed.
+  $(window).resize(function() {
+    var node82 = document.getElementById('expectedBottom82');
+    var rect = node82.getBoundingClientRect();
+    var bookmark82 = document.getElementById('bookmark82');
+    console.log(rect.left + ' ' + rect.top);
+    bookmark82.style.left = rect.left + 'px';
+    bookmark82.style.top = (rect.top + window.scrollY) + 'px';
+    bookmark82.style.width = rect.width + 'px';
+    bookmark82.style.height = rect.height + 'px';
+
+    var node37 = document.getElementById('expectedTop37');
+    var rect = node37.getBoundingClientRect();
+    var bookmark37 = document.getElementById('bookmark37');
+    bookmark37.style.left = rect.left + 'px';
+    bookmark37.style.top = (rect.top + window.scrollY) + 'px';
+    bookmark37.style.width = rect.width + 'px';
+    bookmark37.style.height = rect.height + 'px';
+  });
 
   $('#gear').click(showUnlockedLevels);
   $('#settings').dialog({
@@ -321,10 +350,14 @@ function showGuess() {
 
     document.getElementById('percentage').innerHTML = nRight + '/100 right';
     if (nRight == 100) {
+      console.log('foo');
       showBalloon('Got \'em! Hit Enter to continue.');
+    } else {
+      hideBalloon();
     }
   } catch (e) {
     document.getElementById('percentage').innerHTML = localize('' + e);
+    hideBalloon();
   }
 
   localStorage.setItem('state', JSON.stringify(state));
@@ -426,24 +459,28 @@ for (var y = 0; y < 10; ++y) {
     path.setAttributeNS(null, 'id', 'expectedTop' + i);
     path.setAttributeNS(null, 'd', 'M' + (leftMargin + x * tileDiameter) + ',' + (gridHeight - bottomMargin - y * tileDiameter - tileRadius) + ' a' + tileRadius + ',' + tileRadius + ' 0, 0,1 ' + tileDiameter + ',0');
     path.style['stroke-width'] = 0;
+    path.style.fill = '#FFFFFF';
     document.getElementById('expectedGrid').appendChild(path);
 
     path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttributeNS(null, 'id', 'expectedBottom' + i);
     path.setAttributeNS(null, 'd', 'M' + (leftMargin + x * tileDiameter) + ',' + (gridHeight - bottomMargin - y * tileDiameter - tileRadius) + ' a' + tileRadius + ',' + tileRadius + ' 0, 0,0 ' + tileDiameter + ',0');
     path.style['stroke-width'] = 0;
+    path.style.fill = '#FFFFFF';
     document.getElementById('expectedGrid').appendChild(path);
 
     var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttributeNS(null, 'id', 'actualTop' + i);
     path.setAttributeNS(null, 'd', 'M' + (leftMargin + x * tileDiameter) + ',' + (gridHeight - bottomMargin - y * tileDiameter - tileRadius) + ' a' + tileRadius + ',' + tileRadius + ' 0, 0,1 ' + tileDiameter + ',0');
     path.style['stroke-width'] = 0;
+    path.style.fill = '#FFFFFF';
     document.getElementById('actualGrid').appendChild(path);
 
     path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttributeNS(null, 'id', 'actualBottom' + i);
     path.setAttributeNS(null, 'd', 'M' + (leftMargin + x * tileDiameter) + ',' + (gridHeight - bottomMargin - y * tileDiameter - tileRadius) + ' a' + tileRadius + ',' + tileRadius + ' 0, 0,0 ' + tileDiameter + ',0');
     path.style['stroke-width'] = 0;
+    path.style.fill = '#FFFFFF';
     document.getElementById('actualGrid').appendChild(path);
 
     wrong = document.createElementNS('http://www.w3.org/2000/svg', 'path');
