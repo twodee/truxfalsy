@@ -19,11 +19,12 @@ var worlds = [];
 }
 {
   var levels = [];
-  levels.push({configuration: '0001000000000100000000010000000001000000111111111100010000000001000000000100000000010000000001000000', message: 'If the desired brood is the union of several expressions, combine the expressions using <code>OR</code>. For example, <code>x == 0 OR y > 5</code> causes the kids in either group to be born.'});
-  levels.push({configuration: '0000000000000000000000000000000000001111000000111100000011110000001111000000111100000011110000001111', message: 'If the desired brood is the intersection of several expressions, combine the expressions using <code>AND</code>. For example, <code>x < 3 AND y == 3</code> causes only the kids in both groups to be born.'});
-  levels.push({configuration: '1100000011000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', message: 'When you combine multiple expressions, watch out for operator precedence. In particular, <code>AND</code> has higher precedence than <code>OR</code>. Add parentheses to <code>x < 2 OR x > 7 AND y == 0</code> to alter the default precedence and solve this level.'});
-  levels.push({configuration: '1111111111011111111101111111110111111111011111111101111111110111111111011111111101111111110111111111', message: 'Sometimes it\'s easier to express children in reverse. Enter <code>x == 0 AND y > 0</code> in the box. This litter is the exact opposite of what you want. Flip the logic by negating the <i>entire</i> expression with the NOT operator. For example, <code>NOT(x == 0 || x == 2)</code> expresses all kids except those in columns 0 and 2.'});
-  worlds.push({levels: levels, message: "You've bred all the litters of Generation 2! Your gene therapy skills allow you to express chromosomes using the logical operators <code>AND</code>, <code>OR</code>, and <code>NOT</code>. Mom <code>AND</code> love what your doing, and they want you back for their next broods. Are you ready? If so, click to continue."});
+  levels.push({configuration: '0001000000000100000000010000000001000000111111111100010000000001000000000100000000010000000001000000', message: 'If the desired brood is the union of several expressions, combine the expressions using <code>OR</code>. For example, <code>x == 3 OR y == 4</code> breeds the kids with either an <code>x</code> chromosome of 3 or a <code>y</code> chromosome of 4.'});
+  levels.push({configuration: '0000000000000000000000000000000000001111000000111100000011110000001111000000111100000011110000001111', message: 'If the desired brood is the intersection of several expressions, combine the expressions using <code>AND</code>. For example, <code>x > 5 AND y >= 3</code> causes only the kids whose <code>x</code> is greater than 5 and whose <code>y</code> chromosome is greater than or equal to 3 to be born.'});
+  levels.push({configuration: '1111110011111111001111111100111111110011111111001111111100111111110011111111001111111111111111111111', message: 'Guess what? You can combine more than two expressions! Try using three expressions combined with two <code>OR</code>s for this one.'});
+  levels.push({configuration: '1100000011000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', message: 'When you do combine more than two expressions, watch out for the differing precedence of <code>AND</code> and <code>OR</code>. Operator <code>AND</code> has higher precedence than <code>OR</code>. Add parentheses to <code>x < 2 OR x > 7 AND y == 0</code> to alter the precedence of the <code>OR</code>.'});
+  levels.push({configuration: '1111111111011111111101111111110111111111011111111101111111110111111111011111111101111111110111111111', message: 'Sometimes it\'s easier to express the opposite of the desired chromosomes. Enter <code>x == 0 AND y > 0</code> in the box. This litter is the exact opposite of what you want. Flip the logic by negating the <i>entire</i> expression with the NOT operator: <code>NOT(x == 0 && y > 0)</code>.'});
+  worlds.push({levels: levels, message: "You've bred all the litters of Generation 2! Your gene therapy skills allow you to express chromosomes using the logical operators <code>AND</code>, <code>OR</code>, and <code>NOT</code>. Mom <code>AND</code> Dad love what your doing, and they want you back next season. Are you ready? If so, click to continue."});
 }
 {
   var levels = [];
@@ -33,7 +34,7 @@ var worlds = [];
   levels.push({configuration: '0000000000000000000000000000000001111000000111100000011110000001111000000000000000000000000000000000'});
   levels.push({configuration: '1100000000110000000011000000001100000000110000000011000000001100000000110000000011111111111111111111'});
   levels.push({configuration: '1110000000000000000011100000001110000000111000000011100000001110000000111000000011100000001110000000'});
-  levels.push({configuration: '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'});
+  levels.push({configuration: '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', message: 'The parents are tired. Give them a litter off with the expression <code>false</code>.'});
   levels.push({configuration: '1010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010'});
   levels.push({configuration: '1000000000010000000000100000000001000000000010000000000100000000001000000000010000000000100000000001'});
   levels.push({configuration: '0111111111001111111100011111110000111111000001111100000011110000000111000000001100000000010000000000'});
@@ -47,7 +48,7 @@ var worlds = [];
   levels.push({configuration: '0100000000101000000001010000000010100000000101000000001010000000010100000000101000000001010000000010'});
   levels.push({configuration: '1101111111000000000011011111111101111111110111111111011111111101111111110111111111011111111101111111'});
   levels.push({configuration: '0101010101000000000001010101010101010101010101010100000000000101010101010101010101010101010000000000'});
-  worlds.push({levels: levels, message: "This game seems to be your BRED and butter! Are you ready to help the litters Generation 2 be born? Mom and Dad are looking to have some stranger litters, but they don't require any new operations. If you're ready, click to continue."});
+  worlds.push({levels: levels, message: "You've bred all the litters of Generation 3! This game seems to be your BRED and butter! Are you ready to help the litters of the next generation be born? Mom and Dad are getting the hang of parenting and are looking to have some stranger litters. These won't require any new operators, but some deeper thinking. If you're ready, click to continue."});
 }
 {
   var levels = [];
@@ -71,7 +72,7 @@ var worlds = [];
   levels.push({configuration: '0111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111'});
   levels.push({configuration: '1111111111111111111111111111110000111111111111111111111111111111111111111111111111111111111111111111'});
   levels.push({configuration: '1111111111100000000110000000011000000001100000000110000000011000000001100000000110000000011111111111'});
-  worlds.push({levels: levels, message: "Generation 2 is alive and kicking! Are you ready for Generation 3? For these litters, you'll need some advanced tools of the trade, like bitwise operators and the functions <code>abs</code>, <code>min</code>, and <code>max</code>. Expect frustration and difficulty! click to continue."});
+  worlds.push({levels: levels, message: "Generation 4 is alive and kicking! Are you ready for Generation 5? For these litters, you'll need some advanced tools of the trade, like bitwise operators and the functions <code>abs</code>, <code>min</code>, and <code>max</code>. Expect frustration and difficulty! If you're ready, click to continue."});
 }
 {
   var levels = [];
@@ -96,5 +97,5 @@ var worlds = [];
   levels.push({configuration: '0000111100001111000011110000111100001111000011110000111100001111000011110000111100001111000011110000'});
   levels.push({configuration: '0000000000000000000000000000000000000111000000111100000011110000110001000111000100011100010001111110'});
   levels.push({configuration: '1111111111100000000010111111101010000010101011101010101010101010111010101000001010111111101000000000'});
-  worlds.push({levels: levels, message: "Mom and Dad have decided enough is enough. No more kids. Your years of employment have come to an end. But good news! You have been allotted a share in their will, which when distributed amongst all their children and you, works out to about 1/1000000th of their estate. click to continue."});
+  worlds.push({levels: levels, message: "Mom and Dad have decided enough is enough. No more kids. Your years of employment have come to an end. But good news! You have been allotted a share in their will, which when distributed amongst all their children and you, works out to about 1/1000000th of their estate."});
 }
