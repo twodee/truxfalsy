@@ -62,3 +62,8 @@ div.levelcomplete h3 {
 div.levelcomplete {
   padding: 15px;
 }
+
+/* Settings should appear in front of balloons. */
+.ui-dialog {
+  z-index: 32768 !important;
+}
