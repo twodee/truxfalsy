@@ -53,6 +53,7 @@ function onLevelEnd() {
     contents: localize(worlds[state.currentWorld].message),
   });
 
+  $('#guess').prop('disabled', true);
   if (document.activeElement) {
     document.activeElement.blur();
   }
@@ -287,6 +288,7 @@ function handleKey(e) {
     $('body').hideBalloon();
     $('body').off('keyup');
     next();
+    $('#guess').prop('disabled', false);
     document.getElementById('guess').focus();
   }
 }
