@@ -82,10 +82,12 @@ var iIntro = 0;
 function advanceIntro() {
   if (iIntro > 0) {
     $(intro[iIntro].selector).hideBalloon();
-  } else {
-    if (document.activeElement) {
-      document.activeElement.blur();
+    if (iIntro == intro.length - 1) {
+      document.getElementById('guess').disabled = false;
+      document.getElementById('guess').focus();
     }
+  } else {
+    document.getElementById('guess').disabled = true;
   }
 
   var offsetX = intro[iIntro].hasOwnProperty('offsetX') ? intro[iIntro].offsetX : 0;
