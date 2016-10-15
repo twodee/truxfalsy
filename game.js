@@ -1,4 +1,5 @@
 var isShown = false;
+var isGotEm = false;
 var pendingMessage = null;
 
 function showBalloon(msg) {
@@ -340,13 +341,17 @@ function showGuess() {
     }
 
     document.getElementById('percentage').innerHTML = nRight + '/100 right';
-    if (nRight == 100) {
-      showBalloon('Got \'em! Hit Enter to continue.');
-    }
   } catch (e) {
     document.getElementById('percentage').innerHTML = localize('' + e);
   }
 
+  if (!isGotEm && nRight == 100) {
+    showBalloon('Got \'em! Hit Enter to continue.');
+    isGotEm = true;
+  } else if (isGotEm && nRight != 100) {
+    hideBalloon();
+    isGotEm = false;
+  }
   localStorage.setItem('state', JSON.stringify(state));
 
   return true;
@@ -495,6 +500,7 @@ state.maxWorld = 0;
 state.maxLevel = 0;
 
 function load() {
+  isGotEm = false;
   nRight = 0;
   document.getElementById('levelName').innerHTML = 'Generation ' + state.currentWorld + ', Litter ' + state.currentLevel;
   for (var y = 0; y < 10; ++y) {
