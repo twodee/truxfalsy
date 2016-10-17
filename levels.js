@@ -2,9 +2,9 @@ var worlds = [];
 {
   var levels = [];
   levels.push({configuration: '1111100000111110000011111000001111100000111110000011111000001111100000111110000011111000001111100000'});
-  levels.push({configuration: '0000000000000000000000000000000000000000000000000000000000000000000000000000000011111111111111111111', message: 'Use <code>y</code> and <code>&gt;</code> on this one.'});
-  levels.push({configuration: '1111111111111111111111111111111111111111000000000000000000000000000000000000000000000000000000000000', message: 'Use <code>&lt;=</code> on this one.'});
-  levels.push({configuration: '0000000011000000001100000000110000000011000000001100000000110000000011000000001100000000110000000011', message: 'Use <code>&gt;=</code> on this one.'});
+  levels.push({configuration: '0000000000000000000000000000000000000000000000000000000000000000000000000000000011111111111111111111', message: 'How might you use <code>y</code> and <code>&gt;</code> on this one?'});
+  levels.push({configuration: '1111111111111111111111111111111111111111000000000000000000000000000000000000000000000000000000000000', message: 'How might you use <code>&lt;=</code> on this one?'});
+  levels.push({configuration: '0000000011000000001100000000110000000011000000001100000000110000000011000000001100000000110000000011', message: 'How might you use <code>&gt;=</code> on this one?'});
   worlds.push({levels: levels, message: '<div class="levelcomplete"><h3>Generation Complete</h3>You\'ve expressed all the litters of Generation 0! Your gene therapy skills allow you to express chromosomes using the relational operators <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, and <code>&gt;=</code>. The proud parents are pleased with your services and invite you to help them with the litters of Generation 1. Are you ready? If so, hit Enter to continue.</div>'});
 }
 {
