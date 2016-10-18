@@ -69,3 +69,7 @@ div.levelcomplete {
 .ui-dialog {
   z-index: 32768 !important;
 }
+
+h4 {
+  margin-bottom: 3px;
+}

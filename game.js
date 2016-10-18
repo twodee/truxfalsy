@@ -156,6 +156,12 @@ $(document).ready(function() {
       state.currentWorld = 0;
       state.currentLevel = 0;
     }
+
+    if (!state.hasOwnProperty('syntax') || state.syntax == 'c') {
+      switchToCSyntax();
+    } else {
+      switchToPythonSyntax();
+    }
   } else {
     alert('Trux Falsy requires a web browser that supports HTML5. Without it, your progress cannot be saved.');
   }
@@ -211,7 +217,7 @@ $(document).ready(function() {
     bookmark37.style.height = rect.height + 'px';
   });
 
-  $('#gear').click(showUnlockedLevels);
+  $('#gear').click(showMenu);
   $('#settings').dialog({
     modal: true,
     autoOpen: false,
@@ -232,17 +238,47 @@ function reset() {
   return false;
 }
 
-function showUnlockedLevels() {
-  var list = '<h4>Levels</h4><ul>'
+function switchToCSyntax() {
+  andToken = '&&';
+  orToken = '||';
+  notToken = '!';
+  state.syntax = 'c';
+  localStorage.setItem('state', JSON.stringify(state));
+}
+
+function switchToPythonSyntax() {
+  andToken = 'and';
+  orToken = 'or';
+  notToken = 'not';
+  state.syntax = 'python';
+  localStorage.setItem('state', JSON.stringify(state));
+}
+
+function showMenu() {
+  var html = '<h4>Syntax</h4>'
+  html += '<div style="margin-left: 15px; margin-top: 10px;">';
+  html += '<input type="radio" name="syntax" id="c_syntax"><label for="c_syntax"><code>&amp;&amp;</code> <code>||</code> <code>!</code></label><br>';
+  html += '<input type="radio" name="syntax" id="python_syntax"><label for="python_syntax"><code>and</code> <code>or</code> <code>not</code></label>';
+  html += '</div>';
+  html += '<h4>Levels</h4><ul>'
   for (var world = 0; world <= state.maxWorld; ++world) {
     var nlevels = world == state.maxWorld ? state.maxLevel : worlds[world].levels.length - 1;
     for (var level = 0; level <= nlevels; ++level) {
-      list += '<li><a href="#" onclick="jumpToLevel(' + world + ', ' + level + ')">Generation ' + world + ', Level ' + level + '</a></li>';
+      html += '<li><a href="#" onclick="jumpToLevel(' + world + ', ' + level + ')">Generation ' + world + ', Level ' + level + '</a></li>';
     }
   }
-  list += '<li><a href="#" onclick="reset()">Reset</a></li>';
-  list += '</ul>';
-  $('#settings').html(list);
+  html += '<li><a href="#" onclick="reset()">Reset</a></li>';
+  html += '</ul>';
+  $('#settings').html(html);
+
+  if (!state.hasOwnProperty('syntax') || state.syntax == 'c') {
+    $('#c_syntax').prop('checked', true);
+  } else {
+    $('#python_syntax').prop('checked', true);
+  }
+  
+  $('#c_syntax').click(switchToCSyntax);
+  $('#python_syntax').click(switchToPythonSyntax);
   $('#settings').dialog('open');
 }
 
