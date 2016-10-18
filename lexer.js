@@ -23,12 +23,12 @@ function Lexer(src) {
 
     if (this.i >= src.length) {
       return new Token(EOF, 'the end of your input', src.length, src.length); 
-    } else if (left.match(/^true/)) {
-      this.i += 4;
-      return new Token(LITERAL_TRUE, 'true', this.soFarStartedAt, this.i);
-    } else if (left.match(/^false/)) {
-      this.i += 5;
-      return new Token(LITERAL_FALSE, 'false', this.soFarStartedAt, this.i);
+    } else if (left.match(new RegExp('^' + escapeRegexWildcards(trueToken)))) {
+      this.i += trueToken.length;
+      return new Token(LITERAL_TRUE, trueToken, this.soFarStartedAt, this.i);
+    } else if (left.match(new RegExp('^' + escapeRegexWildcards(falseToken)))) {
+      this.i += falseToken.length;
+      return new Token(LITERAL_FALSE, falseToken, this.soFarStartedAt, this.i);
     } else if (left.match(new RegExp('^' + escapeRegexWildcards(absToken)))) {
       this.i += absToken.length;
       return new Token(ABSOLUTE_VALUE, absToken, this.soFarStartedAt, this.i);

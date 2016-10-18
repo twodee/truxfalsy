@@ -242,6 +242,8 @@ function switchToCSyntax() {
   andToken = '&&';
   orToken = '||';
   notToken = '!';
+  trueToken = 'true';
+  falseToken = 'false';
   state.syntax = 'c';
   localStorage.setItem('state', JSON.stringify(state));
 }
@@ -250,6 +252,8 @@ function switchToPythonSyntax() {
   andToken = 'and';
   orToken = 'or';
   notToken = 'not';
+  trueToken = 'True';
+  falseToken = 'False';
   state.syntax = 'python';
   localStorage.setItem('state', JSON.stringify(state));
 }
@@ -257,8 +261,8 @@ function switchToPythonSyntax() {
 function showMenu() {
   var html = '<h4>Syntax</h4>'
   html += '<div style="margin-left: 15px; margin-top: 10px;">';
-  html += '<input type="radio" name="syntax" id="c_syntax"><label for="c_syntax"><code>&amp;&amp;</code> <code>||</code> <code>!</code></label><br>';
-  html += '<input type="radio" name="syntax" id="python_syntax"><label for="python_syntax"><code>and</code> <code>or</code> <code>not</code></label>';
+  html += '<input type="radio" name="syntax" id="c_syntax"><label for="c_syntax"><code>&amp;&amp;</code> <code>||</code> <code>!</code> <code>true</code> <code>false</code></label><br>';
+  html += '<input type="radio" name="syntax" id="python_syntax"><label for="python_syntax"><code>and</code> <code>or</code> <code>not</code> <code>True</code> <code>False</code></label>';
   html += '</div>';
   html += '<h4>Levels</h4><ul>'
   for (var world = 0; world <= state.maxWorld; ++world) {
@@ -303,7 +307,7 @@ var bottomFalseColor = 'hsl(0, 0%, 85%)';
 // s -> String to convert.
 // <- String with placeholders replaced by language tokens.
 function localize(s) {
-  return s.replace(/AND/g, andToken).replace(/OR/g, orToken).replace(/NOT/g, notToken);
+  return s.replace(/AND/g, andToken).replace(/OR/g, orToken).replace(/NOT/g, notToken).replace(/FALSE/, falseToken).replace(/TRUE/, trueToken);
 }
 
 document.getElementById('guess').onkeyup = function(e) {
