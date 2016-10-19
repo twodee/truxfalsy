@@ -352,7 +352,7 @@ function showGuess() {
     var lexer = new Lexer(src);
     var tokens = lexer.lex();
     var parser = new Parser(tokens);
-    var ast = parser.parse();
+    var ast = parser.parse(state.syntax == 'python');
     console.log(ast);
 
     for (var y = 0; y < 10; ++y) {

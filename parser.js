@@ -1,7 +1,8 @@
 function Parser(tokens) {
   this.tokens = tokens;
 
-  this.parse = function() {
+  this.parse = function(is_python) {
+    this.is_python = is_python;
     this.expressions = [];
     this.i = 0;
     this.expressionOr();
@@ -14,7 +15,7 @@ function Parser(tokens) {
     } else {
       throw 'too many!';
     }
-  }
+  };
 
   this.expressionOr = function() {
     this.expressionAnd();
@@ -25,18 +26,42 @@ function Parser(tokens) {
       var l = this.expressions.pop(); 
       this.expressions.push(new ExpressionOr(l, r));
     }
-  }
+  };
 
   this.expressionAnd = function() {
-    this.expressionBitwiseOr();
+    // In Python, not has lower precedence than the relational operators but
+    // higher precedence than AND.
+    if (this.is_python) {
+      this.expressionPythonNot();
+    } else {
+      this.expressionBitwiseOr();
+    }
+
     while (this.isUp(AND)) {
       ++this.i;
-      this.expressionBitwiseOr();
+
+      if (this.is_python) {
+        this.expressionPythonNot();
+      } else {
+        this.expressionBitwiseOr();
+      }
+
       var r = this.expressions.pop(); 
       var l = this.expressions.pop(); 
       this.expressions.push(new ExpressionAnd(l, r));
     }
-  }
+  };
+
+  this.expressionPythonNot = function() {
+    if (this.isUp(NOT)) {
+      ++this.i;
+      this.expressionBitwiseOr();
+      var r = this.expressions.pop(); 
+      this.expressions.push(new ExpressionNot(r));
+    } else {
+      this.expressionBitwiseOr();
+    }
+  };
 
   this.expressionBitwiseOr = function() {
     this.expressionXor();
@@ -47,7 +72,7 @@ function Parser(tokens) {
       var l = this.expressions.pop(); 
       this.expressions.push(new ExpressionBitwiseOr(l, r));
     }
-  }
+  };
 
   this.expressionXor = function() {
     this.expressionBitwiseAnd();
@@ -58,7 +83,7 @@ function Parser(tokens) {
       var l = this.expressions.pop(); 
       this.expressions.push(new ExpressionXor(l, r));
     }
-  }
+  };
 
   this.expressionBitwiseAnd = function() {
     this.expressionEqual();
@@ -69,7 +94,7 @@ function Parser(tokens) {
       var l = this.expressions.pop(); 
       this.expressions.push(new ExpressionBitwiseAnd(l, r));
     }
-  }
+  };
 
   this.expressionEqual = function() {
     this.expressionRelational();
@@ -85,7 +110,7 @@ function Parser(tokens) {
         this.expressions.push(new ExpressionNotEquals(l, r));
       }
     }
-  }
+  };
 
   this.expressionRelational = function() {
     this.expressionAdditive();
@@ -105,7 +130,7 @@ function Parser(tokens) {
         this.expressions.push(new ExpressionLessThanEquals(l, r));
       }
     }
-  }
+  };
 
   this.expressionAdditive = function() {
     this.expressionMultiplicative();
@@ -121,7 +146,7 @@ function Parser(tokens) {
         this.expressions.push(new ExpressionSubtract(l, r));
       }
     }
-  }
+  };
 
   this.expressionMultiplicative = function() {
     this.expressionNegative();
@@ -139,7 +164,7 @@ function Parser(tokens) {
         this.expressions.push(new ExpressionRemainder(l, r));
       }
     }
-  }
+  };
 
   this.expressionNegative = function() {
     if (this.isUp(MINUS)) {
@@ -147,7 +172,7 @@ function Parser(tokens) {
       this.expressionAtom();
       var r = this.expressions.pop(); 
       this.expressions.push(new ExpressionNegative(r));
-    } else if (this.isUp(NOT)) {
+    } else if (!this.is_python && this.isUp(NOT)) {
       ++this.i;
       this.expressionAtom();
       var r = this.expressions.pop(); 
@@ -190,7 +215,7 @@ function Parser(tokens) {
     } else {
       this.expressionAtom();
     }
-  }
+  };
 
   this.expressionAtom = function() {
     if (this.isUp(X)) {
@@ -219,9 +244,9 @@ function Parser(tokens) {
     } else {
       throw 'Whoa. I ran into ' + this.tokens[this.i].text + ' and really didn\'t expect that.';
     }
-  }
+  };
 
   this.isUp = function(expected) {
     return this.i < this.tokens.length && this.tokens[this.i].type == expected;
-  }
+  };
 }
