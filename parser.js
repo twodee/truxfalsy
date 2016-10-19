@@ -98,7 +98,7 @@ function Parser(tokens) {
 
   this.expressionEqual = function() {
     this.expressionRelational();
-    while (this.isUp(EQUALS) || this.isUp(NOT_EQUALS)) {
+    while (!this.is_python && (this.isUp(EQUALS) || this.isUp(NOT_EQUALS))) {
       var type = this.tokens[this.i].type;
       ++this.i;
       this.expressionRelational();
@@ -114,7 +114,7 @@ function Parser(tokens) {
 
   this.expressionRelational = function() {
     this.expressionAdditive();
-    while (this.isUp(GREATER_THAN) || this.isUp(GREATER_THAN_EQUALS) || this.isUp(LESS_THAN) || this.isUp(LESS_THAN_EQUALS)) {
+    while (this.isUp(GREATER_THAN) || this.isUp(GREATER_THAN_EQUALS) || this.isUp(LESS_THAN) || this.isUp(LESS_THAN_EQUALS) || (this.is_python && (this.isUp(EQUALS) || this.isUp(NOT_EQUALS)))) {
       var type = this.tokens[this.i].type;
       ++this.i;
       this.expressionAdditive();
@@ -126,8 +126,14 @@ function Parser(tokens) {
         this.expressions.push(new ExpressionGreaterThanEquals(l, r));
       } else if (type == LESS_THAN) {
         this.expressions.push(new ExpressionLessThan(l, r));
-      } else {
+      } else if (type == LESS_THAN_EQUALS) {
         this.expressions.push(new ExpressionLessThanEquals(l, r));
+      } else if (type == EQUALS) {
+        this.expressions.push(new ExpressionEquals(l, r));
+      } else if (type == LESS_THAN_EQUALS) {
+        this.expressions.push(new ExpressionNotEquals(l, r));
+      } else {
+        console.log('UHOH');
       }
     }
   };

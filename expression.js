@@ -228,7 +228,7 @@ function ExpressionDivide(l, r) {
     var rr = r.evaluate(env); 
     if (!ll.isInteger) throw '<code>/</code> expects integer operands.';
     if (!rr.isInteger) throw '<code>/</code> expects integer operands.';
-    return new ExpressionInteger(ll.toInteger() / rr.toInteger());
+    return new ExpressionInteger(Math.trunc(ll.toInteger() / rr.toInteger()));
   }
 }
 
