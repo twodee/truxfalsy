@@ -327,12 +327,16 @@ function handleKey(e) {
   if (!e) e = window.event;
   var keyCode = e.keyCode || e.which;
   if (keyCode == '13') {
-    $('body').hideBalloon();
-    $('body').off('keyup');
+    hideBodyBalloon();
     next();
-    $('#guess').prop('disabled', false);
-    document.getElementById('guess').focus();
   }
+}
+
+function hideBodyBalloon() {
+  $('body').hideBalloon();
+  $('body').off('keyup');
+  $('#guess').prop('disabled', false);
+  document.getElementById('guess').focus();
 }
 
 var nRight = 0;
@@ -544,6 +548,9 @@ state.maxWorld = 0;
 state.maxLevel = 0;
 
 function load() {
+  // In case the level completed message is showing...
+  hideBodyBalloon();
+
   isGotEm = false;
   nRight = 0;
   document.getElementById('levelName').innerHTML = 'Generation ' + state.currentWorld + ', Litter ' + state.currentLevel;
