@@ -96,7 +96,7 @@ var worlds = [];
   levels.push({configuration: '0111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111'});
   levels.push({configuration: '1111111111111111111111111111110000111111111111111111111111111111111111111111111111111111111111111111'});
   levels.push({configuration: '1111111111100000000110000000011000000001100000000110000000011000000001100000000110000000011111111111'});
-  worlds.push({levels: levels, message: '<div class="levelcomplete"><h3>Generation Complete</h3>Generation 5 is alive and kicking! Are you ready for Generation 5? For these litters, you\'ll need some advanced tools of the trade, like bitwise operators and the functions <code>abs</code>, <code>min</code>, and <code>max</code>. Expect frustration and difficulty! If you\'re ready, hit Enter to continue.</div>'});
+  worlds.push({levels: levels, message: '<div class="levelcomplete"><h3>Generation Complete</h3>Generation 5 is alive and kicking! Are you ready for Generation 6? For these litters, you\'ll need some advanced tools of the trade, like bitwise operators and the functions <code>abs</code>, <code>min</code>, and <code>max</code>. Expect frustration and difficulty! If you\'re ready, hit Enter to continue.</div>'});
 }
 {
   var levels = [];
