@@ -73,3 +73,11 @@ div.levelcomplete {
 h4 {
   margin-bottom: 3px;
 }
+
+.filled {
+  color: #FFD700;
+}
+
+.empty {
+  color: rgb(30%, 30%, 30%);
+}

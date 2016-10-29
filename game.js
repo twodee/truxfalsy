@@ -264,15 +264,21 @@ function showMenu() {
   html += '<input type="radio" name="syntax" id="c_syntax"><label for="c_syntax"><code>&amp;&amp;</code> <code>||</code> <code>!</code> <code>true</code> <code>false</code></label><br>';
   html += '<input type="radio" name="syntax" id="python_syntax"><label for="python_syntax"><code>and</code> <code>or</code> <code>not</code> <code>True</code> <code>False</code></label>';
   html += '</div>';
-  html += '<h4>Levels</h4><ul>'
+  html += '<h4>Levels</h4><ul style="margin-left: 0px; padding-left: 15px; list-style: none;">'
   for (var world = 0; world <= state.maxWorld; ++world) {
     var nlevels = world == state.maxWorld ? state.maxLevel : worlds[world].levels.length - 1;
     for (var level = 0; level <= nlevels; ++level) {
-      html += '<li><a href="#" onclick="jumpToLevel(' + world + ', ' + level + ')">Generation ' + world + ', Level ' + level + '</a></li>';
+      var stars = '';
+      if (state.hasOwnProperty('nstars-' + world + '-' + level)) {
+        stars = rating(state['nstars-' + world + '-' + level]);
+      } else {
+        stars = rating(0);
+      }
+      html += '<li>' + stars + ' <a href="#" onclick="jumpToLevel(' + world + ', ' + level + ')">Generation ' + world + ', Litter ' + level + '</a></li>';
     }
   }
-  html += '<li><a href="#" onclick="reset()">Reset</a></li>';
   html += '</ul>';
+  html += '<a href="#" onclick="reset()">Clear History</a>';
   $('#settings').html(html);
 
   if (!state.hasOwnProperty('syntax') || state.syntax == 'c') {
@@ -344,6 +350,7 @@ var nRight = 0;
 function showGuess() {
   var src = document.getElementById('guess').value;
   state['solution-' + state.currentWorld + '-' + state.currentLevel] = src;
+  state['nstars-' + state.currentWorld + '-' + state.currentLevel] = 0;
 
   if (src == '') {
     document.getElementById('percentage').innerHTML = '&nbsp;';
@@ -394,7 +401,12 @@ function showGuess() {
   }
 
   if (!isGotEm && nRight == 100) {
-    showBalloon('Got \'em! Hit Enter to continue.');
+    var nchars = src.replace(/\s/g, '').length;
+    var stars = worlds[state.currentWorld].levels[state.currentLevel].stars;
+    for (var n = 1; n < 3 && nchars <= stars[n - 1]; ++n) {
+    }
+    state['nstars-' + state.currentWorld + '-' + state.currentLevel] = n;
+    showBalloon('Got \'em! Your expression earned ' + rating(n) + '. Hit Enter to continue. ' + nchars);
     isGotEm = true;
   } else if (isGotEm && nRight != 100) {
     hideBalloon();
@@ -403,6 +415,15 @@ function showGuess() {
   localStorage.setItem('state', JSON.stringify(state));
 
   return true;
+}
+
+function rating(n) {
+  var stars = '';
+  for (var i = 0; i < 3; ++i) {
+    var clazz = i < n ? 'filled' : 'empty';
+    stars += '<span class="' + clazz + '">&#x2605;</span>';
+  }
+  return stars;
 }
 
 function next() {
