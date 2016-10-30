@@ -406,7 +406,7 @@ function showGuess() {
     for (var n = 1; n < 3 && nchars <= stars[n - 1]; ++n) {
     }
     state['nstars-' + state.currentWorld + '-' + state.currentLevel] = n;
-    showBalloon('Got \'em! Your expression earned ' + rating(n) + '. Hit Enter to continue. ' + nchars);
+    showBalloon('Got \'em! Your expression earned ' + rating(n) + '. Hit Enter to continue.');
     isGotEm = true;
   } else if (isGotEm && nRight != 100) {
     hideBalloon();
