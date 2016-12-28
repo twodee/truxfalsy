@@ -75,7 +75,7 @@ var intro = [
   {selector: '#bookmark82', message: 'For example, this kid\'s <code>x</code> chromosome is 2 and its <code>y</code> chromosome is 8. The eager parents want this kid to be born.', width: 250, position: 'bottom', offsetY: 15},
   {selector: '#bookmark37', message: 'Check out this kid. Its <code>x</code> chromosome is 7 and its <code>y</code> chromosome is 3. The eager parents aren\'t yet ready for this kid to be born. But don\'t feel too bad. In future litters, kid 7-3 will see the light of day.', width: 250, position: 'top', offsetY: -15},
   {selector: '#actualGrid', message: 'On the right are the kids that will actually be born given the couple\'s current Genetic Expression, which you craft.'},
-  {selector: '#guess', message: 'In the box above, enter a Genetic Expression that selects out all the kids whose <code>x</code> chromosome is less than 5 by typing <code>x &lt; 5</code>.'},
+  {selector: '#guess', message: 'In the box above, enter a Genetic Expression that selects out all the kids whose <code>x</code> chromosome is less than 5 by typing <code>x &lt; 5</code>. But try entering the wrong number first to see what happens!'},
 ];
 var iIntro = 0;
 
