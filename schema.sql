@@ -1,0 +1,20 @@
+DROP TABLE IF EXISTS guess;
+DROP TABLE IF EXISTS sitting;
+
+CREATE TABLE sitting (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE guess (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  sitting_id INT NOT NULL,
+  ip VARCHAR(39),
+  generation INT,
+  litter INT,
+  expression TINYTEXT,
+  nright INT,
+  nstars INT,
+  time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (sitting_id) REFERENCES sitting(id)
+);

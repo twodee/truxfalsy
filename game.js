@@ -319,7 +319,7 @@ function localize(s) {
 document.getElementById('guess').onkeyup = function(e) {
   if (!e) e = window.event;
   var keyCode = e.keyCode || e.which;
-  if (keyCode == '13' && nRight == 100) {
+  if (keyCode == '13' && nright == 100) {
     if (state.currentLevel == worlds[state.currentWorld].levels.length - 1) {
       onLevelEnd();
     } else {
@@ -345,9 +345,9 @@ function hideBodyBalloon() {
   document.getElementById('guess').focus();
 }
 
-var nRight = 0;
+var nright = 0;
 
-function showGuess() {
+function showGuess(isSnapped) {
   var src = document.getElementById('guess').value;
   state['solution-' + state.currentWorld + '-' + state.currentLevel] = src;
   state['nstars-' + state.currentWorld + '-' + state.currentLevel] = 0;
@@ -357,14 +357,15 @@ function showGuess() {
     load();
     return;
   }
-  nRight = 0;
+  nright = 0;
 
+  var isParsed = false;
   try {
     var lexer = new Lexer(src);
     var tokens = lexer.lex();
     var parser = new Parser(tokens);
     var ast = parser.parse(state.syntax == 'python');
-    console.log(ast);
+    // console.log(ast);
 
     for (var y = 0; y < 10; ++y) {
       for (var x = 0; x < 10; ++x) {
@@ -388,30 +389,37 @@ function showGuess() {
         var wrong = document.getElementById('wrong' + i);    
         if (result.isBoolean && result.toBoolean() === leval(state.currentWorld, state.currentLevel, x, y)) {
           wrong.style['stroke-opacity'] = 0.0;
-          ++nRight;
+          ++nright;
         } else {
           wrong.style['stroke-opacity'] = 0.2;
         }
       }
     }
 
-    document.getElementById('percentage').innerHTML = nRight + '/100 right';
+    document.getElementById('percentage').innerHTML = nright + '/100 right';
+    isParsed = true;
   } catch (e) {
     document.getElementById('percentage').innerHTML = localize('' + e);
   }
 
-  if (!isGotEm && nRight == 100) {
+  var nstars = 0;
+  if (!isGotEm && nright == 100) {
     var nchars = src.replace(/\s/g, '').length;
     var stars = worlds[state.currentWorld].levels[state.currentLevel].stars;
-    for (var n = 1; n < 3 && nchars <= stars[n - 1]; ++n) {
+    for (nstars = 1; nstars < 3 && nchars <= stars[nstars - 1]; ++nstars) {
     }
-    state['nstars-' + state.currentWorld + '-' + state.currentLevel] = n;
-    showBalloon('Got \'em! Your expression earned ' + rating(n) + '. Hit Enter to continue.');
+    state['nstars-' + state.currentWorld + '-' + state.currentLevel] = nstars;
+    showBalloon('Got \'em! Your expression earned ' + rating(nstars) + '. Hit Enter to continue.');
     isGotEm = true;
-  } else if (isGotEm && nRight != 100) {
+  } else if (isGotEm && nright != 100) {
     hideBalloon();
     isGotEm = false;
   }
+
+  if (isParsed && isSnapped) {
+    snapshot(state.currentWorld, state.currentLevel, src, nright, nstars);
+  }
+
   localStorage.setItem('state', JSON.stringify(state));
 
   return true;
@@ -573,7 +581,7 @@ function load() {
   hideBodyBalloon();
 
   isGotEm = false;
-  nRight = 0;
+  nright = 0;
   document.getElementById('levelName').innerHTML = 'Generation ' + state.currentWorld + ', Litter ' + state.currentLevel;
   for (var y = 0; y < 10; ++y) {
     for (var x = 0; x < 10; ++x) {
@@ -603,11 +611,11 @@ function load() {
       src.value = state[key];
       src.focus();
       // hideBalloon();
-      showGuess();
+      showGuess(false);
     }
   }
 
-  if (nRight != 100) {
+  if (nright != 100) {
     if (state.currentWorld == 0 && state.currentLevel == 0) {
       advanceIntro();
     }
