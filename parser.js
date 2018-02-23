@@ -128,9 +128,9 @@ function Parser(tokens) {
         this.expressions.push(new ExpressionLessThan(l, r));
       } else if (type == LESS_THAN_EQUALS) {
         this.expressions.push(new ExpressionLessThanEquals(l, r));
-      } else if (type == EQUALS) {
+      } else if (this.is_python && type == EQUALS) {
         this.expressions.push(new ExpressionEquals(l, r));
-      } else if (type == NOT_EQUALS) {
+      } else if (this.is_python && type == NOT_EQUALS) {
         this.expressions.push(new ExpressionNotEquals(l, r));
       } else {
         console.log('UHOH');
