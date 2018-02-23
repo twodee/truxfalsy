@@ -130,7 +130,7 @@ function Parser(tokens) {
         this.expressions.push(new ExpressionLessThanEquals(l, r));
       } else if (type == EQUALS) {
         this.expressions.push(new ExpressionEquals(l, r));
-      } else if (type == LESS_THAN_EQUALS) {
+      } else if (type == NOT_EQUALS) {
         this.expressions.push(new ExpressionNotEquals(l, r));
       } else {
         console.log('UHOH');
