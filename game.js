@@ -404,7 +404,13 @@ function showGuess(isSnapped) {
 
   var nstars = 0;
   if (!isGotEm && nright == 100) {
-    var nchars = src.replace(/\s/g, '').length;
+    var canonicalSource = src.replace(/\s/g, '');
+    if (state.syntax == 'python') {
+      canonicalSource = canonicalSource.replace(/and/g, '&&');
+      canonicalSource = canonicalSource.replace(/or/g, '||');
+      canonicalSource = canonicalSource.replace(/not/g, '!');
+    }
+    var nchars = canonicalSource.length;
     var stars = worlds[state.currentWorld].levels[state.currentLevel].stars;
     for (nstars = 1; nstars < 3 && nchars <= stars[nstars - 1]; ++nstars) {
     }
